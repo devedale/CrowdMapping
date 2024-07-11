@@ -38,6 +38,20 @@ if grep -q '^RSA_AUTH=true' .env; then
 fi
 
 
+
+# Cancella i file se esistono
+ENV_FILE="./.env"
+if [ -f "$ENV_FILE" ]; then
+    echo "File .env presente"
+else
+    cp example.env .env
+    echo "File .env copiato da file example.env"
+fi
+
+
+
+
+
 # Avvia i servizi definiti nel docker-compose.yml utilizzando il file .env
 docker-compose --env-file .env up
 
