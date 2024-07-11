@@ -1,0 +1,63 @@
+version: '3'
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    ports:
+      - "${EXT_API_PORT}:${API_PORT}"
+    depends_on:
+      - db
+    networks:
+      - network1
+      - network2
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      API_VERSION: ${API_VERSION}
+      API_PORT: ${API_PORT}
+      ADMIN_EMAIL: ${ADMIN_EMAIL}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DB: ${DB_NAME}
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_EXP_H: ${JWT_EXP_H}
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+      REDIS_URL: ${REDIS_URL}
+      REDIS_PORT: ${REDIS_PORT}
+    volumes:
+      - ./app/src:/usr/src/app/src
+
+  db:
+    build:
+      context: ./db
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - ./db/initdb:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - network1
+
+  redis:
+    image: redis
+    ports: 
+      - "6379:${REDIS_PORT}"
+    depends_on:
+      - app
+    networks:
+      - network2
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD}
+
+volumes:
+  db_data:
+
+networks:
+  network1:
+    driver: bridge
+  network2:
+    driver: bridge
