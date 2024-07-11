@@ -34,7 +34,7 @@ class User extends Model {
                     type: DataTypes.STRING,
                     allowNull: false,
                 },
-                roleId: { // Aggiungi questa configurazione
+                roleId: { 
                     type: DataTypes.INTEGER,
                     field: 'roleid',
                     references: {

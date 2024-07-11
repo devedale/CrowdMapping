@@ -1,8 +1,5 @@
-import { usersController } from '../controllers/usersController';
 import { authMiddleware } from '../middlewares/auth';
 import { authRSAMiddleware } from '../middlewares/authRSA';
-import { registerController } from '../controllers/registerController';
-import { loginController } from '../controllers/loginController';
 import UserService from '../services/user';
 
 

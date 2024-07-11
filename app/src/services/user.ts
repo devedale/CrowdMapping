@@ -1,4 +1,3 @@
-import { Request, Response } from "express";
 import { UserRepository, ICreateUser } from "../database/repository/user";
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { HttpStatusCode } from '../errors/HttpStatusCode';
