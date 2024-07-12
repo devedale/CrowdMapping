@@ -55,7 +55,9 @@ class ReportService {
 
 
             const userId = req['userId']
-            const newReport = await reportRepository.createReport({ userId, date, position, type, severity});
+            const status = "PENDING"
+
+            const newReport = await reportRepository.createReport({ userId, date, position, type, severity, status});
             res.status(200).json({ success: true, message: 'Report Creato', report: newReport });
         } catch (error) {
             next(ErrorFactory

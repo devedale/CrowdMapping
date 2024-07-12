@@ -3,6 +3,13 @@ import sequelize from '../connection';
 import { Dao } from './dao'; 
 import { User } from './user'; 
 
+
+export enum ReportStatus {
+    PENDING = 'PENDING',
+    REJECTED = 'PENDING',
+    VALIDATED = 'PENDING'
+}
+
 export enum ReportType {
     POTHOLE = 'Pothole',
     DIP = 'Dip'
@@ -30,6 +37,7 @@ class Report extends Model {
     private position!: { type: "Point"; coordinates: number[] };
     private type!: ReportType;
     private severity!: Severity.Pothole | Severity.Dip;
+    private status!: ReportStatus;
     public dao!: Dao<Report>;
 
     static initialize(): void {
@@ -75,6 +83,15 @@ class Report extends Model {
                         Severity.Dip.LOW,
                         Severity.Dip.MEDIUM,
                         Severity.Dip.HIGH
+                    ],
+                    allowNull: false
+                },
+                status: {
+                    type: DataTypes.ENUM,
+                    values: [
+                        ReportStatus.PENDING,
+                        ReportStatus.VALIDATED,
+                        ReportStatus.REJECTED
                     ],
                     allowNull: false
                 },

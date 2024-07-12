@@ -37,6 +37,7 @@ CREATE TABLE reports (
     position GEOGRAPHY(Point) NOT NULL,
     type VARCHAR(50) NOT NULL ,
     severity VARCHAR(50) NOT NULL,
+    status VARCHAR(50) NOT NULL,
     createdat TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updatedat TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
