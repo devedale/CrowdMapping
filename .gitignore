@@ -2,3 +2,4 @@
 ./db/initdb/init.sql
 ./app/src/services/jwtRS256.key
 ./app/src/middlewares/jwtRS256.key.pub
+github.txt

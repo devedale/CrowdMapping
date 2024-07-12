@@ -1,4 +1,4 @@
-import { authMiddleware } from '../middlewares/auth';
+import authMiddleware from '../middlewares/jwtAuth';
 import { authRSAMiddleware } from '../middlewares/authRSA';
 import UserService from '../services/user';
 
