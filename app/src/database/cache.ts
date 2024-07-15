@@ -1,13 +1,10 @@
 import Redis from 'ioredis';
 
 const redisURL = process.env.REDIS_URL || 'localhost'; 
-const redisPort = parseInt(process.env.REDIS_PORT || '6379'); 
-const redisPassword = process.env.REDIS_PASSWORD; 
-
+const redisPort = 6379; 
 const client = new Redis({
   host: redisURL,
-  port: redisPort,
-  password: redisPassword
+  port: redisPort
 });
 
 client.on('error', (err) => {

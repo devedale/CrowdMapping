@@ -35,6 +35,12 @@ if grep -q '^RSA_AUTH=true' .env; then
     openssl rsa -in jwtRS256.key -pubout -outform PEM -out jwtRS256.key.pub
     mv jwtRS256.key ./app/src/services/jwtRS256.key 
     mv jwtRS256.key.pub ./app/src/middlewares/jwtRS256.key.pub 
+elif grep -q '^RSA_AUTH=test' .env; then
+    echo "RSA_AUTH è impostato su test. Copio chiavi RSA dalla cartella ./test..."
+    cp ./test/jwtRS256.key ./app/src/services/jwtRS256.key 
+    cp ./test/jwtRS256.key.pub ./app/src/middlewares/jwtRS256.key.pub 
+else
+    echo "RSA_AUTH non è impostato su true o test."
 fi
 
 

@@ -56,7 +56,7 @@ class UserService {
             }
 
             let token;
-            if (process.env.RSA_AUTH === 'true') {
+            if (process.env.RSA_AUTH === 'true' || process.env.RSA_AUTH === 'test') {
                 // Generazione del token JWT Asymmetrico
                 const private_key = await fs.promises.readFile('./src/services/jwtRS256.key');
                 token = jwt.sign(

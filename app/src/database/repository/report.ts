@@ -1,6 +1,6 @@
 import { User } from "../models/user";
 import { Role } from "../models/role"; 
-import { Report } from "../models/report";
+import { Report, ReportStatus } from "../models/report";
 
 interface ICreateReport {
     private date?: Date;
@@ -46,7 +46,7 @@ class ReportRepository {
         try {
             await report.update(data);
             console.log("Utente aggiornato:", report);
-            await Report.dao.update(report, data); // Aggiorna anche nella cache
+            await Report.dao.update(report, data);
         } catch (error) {
             console.error(error);
             throw new Error("Aggiornamento utente fallito");
@@ -56,10 +56,33 @@ class ReportRepository {
         try {
             await report.destroy();
             console.log("Utente eliminato:", report);
-            await Report.dao.delete(report); // Rimuovi anche dalla cache
+            await Report.dao.delete(report);
         } catch (error) {
             console.error(error);
             throw new Error("Eliminazione utente fallita");
+        }
+    }
+    async reportValidated(id: Number): Promise<void> {
+        try {
+            const report = getReportById(id)
+            report.status = ReportStatus.VALIDATED;
+            console.log(`Report status updated to: ${report.status}`);
+        } catch (error) {
+            console.error(error);
+            throw new Error("Report status update failed");
+        }
+    }
+    async reportRejected(id: Number): Promise<void> {
+        try {
+            const report = this.getReportById(id)
+            if(report.status !== ReportStatus.PENDING) {
+                report.status = ReportStatus.REJECTED;
+                console.log(`Report status updated to: ${report.status}`);
+            }
+
+        } catch (error) {
+            console.error(error);
+            throw new Error("Report status update failed");
         }
     }
 }

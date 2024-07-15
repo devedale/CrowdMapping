@@ -1,8 +1,8 @@
 import { RoleRepository } from "./repository/role";
 import { UserRepository } from "./repository/user";
 
-const MAX_RETRIES = 3; // Maximum number of retries
-const RETRY_DELAY = 2000; // Delay between retries in milliseconds
+const MAX_RETRIES = 3; 
+const RETRY_DELAY = 2000; 
 
 export default async () => {
     let retries = 0;
