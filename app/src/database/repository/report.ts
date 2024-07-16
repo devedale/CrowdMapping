@@ -30,7 +30,7 @@ class ReportRepository {
             return report as Report | null;
         } catch (error) {
             console.error(error);
-            throw new Error("Recupero utente per ID fallito");
+            throw new Error("Recupero report per ID fallito");
         }
     }
     async getReports(): Promise<Report[] | null> {
@@ -39,17 +39,18 @@ class ReportRepository {
             return reports as Report[] | null;
         } catch (error) {
             console.error(error);
-            throw new Error("Recupero utenti fallito");
+            throw new Error("Recupero report fallito");
         }
     }
     async updateReport(report: Report, data: Partial<ICreateReport>): Promise<void> {
         try {
-            await report.update(data);
-            console.log("Utente aggiornato:", report);
+            console.log(`Report : ${report}, data : ${data}`);
             await Report.dao.update(report, data);
+            
+
         } catch (error) {
             console.error(error);
-            throw new Error("Aggiornamento utente fallito");
+            throw new Error("Aggiornamento report fallito");
         }
     }
     async deleteReport(report: Report): Promise<void> {
@@ -59,31 +60,53 @@ class ReportRepository {
             await Report.dao.delete(report);
         } catch (error) {
             console.error(error);
-            throw new Error("Eliminazione utente fallita");
+            throw new Error("Eliminazione report fallita");
         }
     }
-    async reportValidated(id: Number): Promise<void> {
+    async validateReport(id: Number): Promise<void> {
         try {
-            const report = getReportById(id)
-            report.status = ReportStatus.VALIDATED;
+            const report = await this.getReportById(id)
+            await this.updateReport(report, {status: ReportStatus.VALIDATED})
             console.log(`Report status updated to: ${report.status}`);
         } catch (error) {
             console.error(error);
             throw new Error("Report status update failed");
         }
     }
-    async reportRejected(id: Number): Promise<void> {
+    async rejectReport(id: Number): Promise<void> {
         try {
-            const report = this.getReportById(id)
-            if(report.status !== ReportStatus.PENDING) {
-                report.status = ReportStatus.REJECTED;
-                console.log(`Report status updated to: ${report.status}`);
-            }
-
+            const report = await this.getReportById(id)
+            await this.updateReport(report, {status: ReportStatus.REJECTED})
+            console.log(`Report status updated to: ${report.status}`);
         } catch (error) {
             console.error(error);
             throw new Error("Report status update failed");
         }
+    }
+    async bulkUpdateReport(validate_ids: number[], reject_ids: number[]): Promise<{ validated: number[], rejected: number[] }> {
+        const validatedUpdated: number[] = [];
+        const rejectedUpdated: number[] = [];
+        for (const id of validate_ids){
+            try {
+                this.validateReport(id)
+                console.log(`Report ${id} status updated to ${ReportStatus.VALIDATED}`);
+                validatedUpdated.push(id);
+            } catch (error) {
+                console.error(`Failed to update report ${id}: ${error}`);
+            }
+        }
+        for (const id of reject_ids){
+            try {
+                this.rejectReport(id)
+                console.log(`Report ${id} status updated to ${ReportStatus.REJECTED}`);
+                rejectedUpdated.push(id);
+            } catch (error) {
+                console.error(`Failed to update report ${id}: ${error}`);
+            }
+        }
+
+    return { validated: validatedUpdates, rejected: rejectedUpdates };
+
     }
 }
 

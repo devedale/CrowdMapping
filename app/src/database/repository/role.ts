@@ -25,11 +25,12 @@ class RoleRepository {
             throw new Error("Recupero ruolo per ID fallito");
         }
     }
-    async deleteRole(role: Role): Promise<void> {
+    async deleteRole(role: Role): Promise<boolean> {
         try {
             await role.destroy();
             console.log("Utente eliminato:", role);
             await Role.dao.delete(role); 
+            return true;
         } catch (error) {
             console.error(error);
             throw new Error("Eliminazione ruolo fallita");

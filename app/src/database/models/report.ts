@@ -6,8 +6,8 @@ import { User } from './user';
 
 export enum ReportStatus {
     PENDING = 'PENDING',
-    REJECTED = 'PENDING',
-    VALIDATED = 'PENDING'
+    REJECTED = 'REJECTED',
+    VALIDATED = 'VALIDATED'
 }
 
 export enum ReportType {

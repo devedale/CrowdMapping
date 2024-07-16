@@ -2,7 +2,9 @@ import { ReportRepository, ICreateReport } from "../database/repository/report";
 import { ReportType, Severity } from "../database/models/report";
 import { ErrorFactory } from '../errors/ErrorFactory';
 import { HttpStatusCode } from '../errors/HttpStatusCode';
-
+import {
+    id
+} from '../../../../.vscode-server/extensions/visualstudioexptteam.vscodeintellicode-1.3.1/dist/939.intellicode';
 const reportRepository = new ReportRepository();
 
 class ReportService {
@@ -80,7 +82,7 @@ class ReportService {
                     );
             }
 
-            res.json({ success: true, message: 'Lista Report', reports });
+            res.status(200).json({ success: true, message: 'Lista Report', reports });
         } catch (err) {
             next(ErrorFactory
                 .getError(HttpStatusCode.InternalServerError)
@@ -89,6 +91,110 @@ class ReportService {
             );
         }
     
+    }
+    async getReportById(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Manca il parametro id della richiesta')
+                    );
+            }
+            if (isNaN(parseInt(id))) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Id non valido')
+                    );
+            }
+            const report = await reportRepository.getReportById(id);
+            if (!report) {
+                return res
+                   .status(HttpStatusCode.NotFound)
+                   .json(ErrorFactory
+                        .getError(HttpStatusCode.NotFound)
+                        .setDetails('Report non trovato')
+                    );
+            }
+            res.status(200).json({ success: true, message: 'Report', report });
+
+        } catch (err) {
+            next(ErrorFactory
+                .getError(HttpStatusCode.InternalServerError)
+                .setDetails('Errore durante il recupero del report.')
+                .setErrorDetail(err)
+            );
+        }
+    
+    }
+    async validateReport(req: Request, res: Response, next: NextFunction) {
+        try {
+            const id = req.params.id;
+            if (!id) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Fornire id Report da aggiornare')
+                    );
+            }
+            if (await reportRepository.validateReport(id)){
+            res.status(200).json({ success: true, message: `Report ${id} validated` });
+            }
+        } catch (err) {
+            next(ErrorFactory
+                .getError(HttpStatusCode.InternalServerError)
+                .setDetails('Errore durante l\'aggiornamento del report.')
+                .setErrorDetail(err)
+            );
+        }
+    
+    }
+    async rejectReport(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.body;
+            if (!id) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Fornire id Report da aggiornare')
+                    );
+            }
+            await reportRepository.rejectReport(id)
+            res.status(200).json({ success: true, message: `Report ${id} rejected` });
+        } catch (err) {
+            next(ErrorFactory
+                .getError(HttpStatusCode.InternalServerError)
+                .setDetails('Errore durante l\'aggiornamento del report.')
+                .setErrorDetail(err)
+            );
+        }
+    }
+    async bulkUpdateReport(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { validate_ids, reject_ids} = req.body;
+            if (!validate_ids || !reject_ids) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Fornire un request body {validate_ids: number[], reject_ids: number[]}')
+                    );
+            }
+            const results = await reportRepository.bulkUpdateReport(req.body)
+            res.status(200).json({ success: true, message: `Results: ${results}` });
+        } catch (err) {
+            next(ErrorFactory
+                .getError(HttpStatusCode.InternalServerError)
+                .setDetails('Errore durante l\'aggiornamento dei report.')
+                .setErrorDetail(err)
+            );
+        }
     }
 }
 
