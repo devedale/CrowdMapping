@@ -186,7 +186,35 @@ class ReportService {
         const isNumberArray = (arr: Number[]): boolean => {
             return arr.filter(item => isNaN(parseInt(item))).length === 0;
         };
+        /*
+        const filterPendingArray = async (arr: number[]): Promise<number[]> => {
+            const reports = await arr.map(async id => {
+                const report = await reportRepository.getReportById(id);
+                return { id, status: report.status };
+            });
         
+            return reports
+                .filter(report => report.status === ReportStatus.PENDING)
+                .map(report => report.id);
+        };
+        */
+
+        const filterPendingArray = async (arr: number[]): Promise<number[]> => {
+            const pendingReports: number[] = [];
+            
+            for (const id of arr) {
+                const report = await reportRepository.getReportById(id);
+                
+                if ( report !== null && report.status === ReportStatus.PENDING) {
+                    pendingReports.push(id);
+                }
+            }
+            
+            return pendingReports;
+
+        };
+        
+
         try {
             const { validate_ids, reject_ids } = req.body;
             if (!isNumberArray(validate_ids) || !isNumberArray(reject_ids)) {
@@ -195,9 +223,11 @@ class ReportService {
 
             }
 
-            
-            const { validated, rejected } = await reportRepository.bulkUpdateReport(validate_ids, reject_ids);
-            return res.status(200).json({ success: true, validated, rejected });
+            const validated = filterPendingArray(validate_ids)
+            const rejected = filterPendingArray(reject_ids);
+            const results = await reportRepository.bulkUpdateReport(validated, rejected);
+
+            return res.status(200).json({ success: true, results});
         
         } catch (err) {
             
