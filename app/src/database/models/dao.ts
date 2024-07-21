@@ -92,31 +92,37 @@ export class Dao<T extends Model> implements DaoI<T> {
         }
     }
 
-    async update(instance: T, updateParams: Optional<T, keyof T>): Promise<boolean> {
+    async update(instance: T, updateParams: Partial<T>): Promise<0 | 1> {
         const id = (instance as any).id as number;
         if (!id) {
             console.error('Instance ID is missing');
-            return false;
+            return 0;
         }
-
+    
         try {
-            await this.model.update(updateParams, { where: { id } });
             await this.invalidateCache(instance);
-            return true;
+            const [affectedRows] = await this.model.update(updateParams, { where: { id } });
+            return affectedRows ? 1 : 0;
         } catch (error) {
             console.error(`Error in update method: ${error}`);
-            return false;
+            return 0;
         }
     }
 
-    async delete(instance: T): Promise<boolean> {
+    async delete(instance: T): Promise<0 | 1> {
+        const id = (instance as any).id as number;
+        if (!id) {
+            console.error('Instance ID is missing');
+            return 0;
+        }
+    
         try {
-            await instance.destroy();
             await this.invalidateCache(instance);
-            return true;
+            const result = await this.model.destroy({ where: { id } });
+            return result ? 1 : 0;
         } catch (error) {
             console.error(`Error in delete method: ${error}`);
-            return false;
+            return 0;
         }
     }
 

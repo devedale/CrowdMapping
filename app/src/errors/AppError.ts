@@ -6,6 +6,7 @@ export interface ErrorMsg {
     setDetails(details?: string): ErrorMsg;
     setErrorDetail(error?: any): ErrorMsg;
     toJSON(): { message: string, code: HttpStatusCode, details?: string, error?: any };
+    success: boolean;
     message: string;
     code: HttpStatusCode;
     details?: string;
@@ -13,16 +14,17 @@ export interface ErrorMsg {
 }
 
 class BaseError extends Error implements ErrorMsg {
+    success: boolean;
     code: HttpStatusCode;
     details?: string;
     error?: any;
 
     constructor(message: string, code: HttpStatusCode, details?: string, error?: any) {
         super(message);
+        this.success = false;
         this.code = code;
         this.details = details;
         this.error = error;
-        Object.setPrototypeOf(this, new.target.prototype);
     }
 
     getMsg(): string {
@@ -45,6 +47,7 @@ class BaseError extends Error implements ErrorMsg {
 
     toJSON() {
         return {
+            success: this.success,
             message: this.message,
             code: this.code,
             details: this.details,

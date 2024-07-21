@@ -4,7 +4,7 @@ import { ErrorFactory } from '../errors/ErrorFactory';
 
 export default (req: Request, res: Response, next: NextFunction) => {
     res.build = (errorType: string, message: string) => {
-        const error = ErrorFactory.getError2(errorType);
+        const error = ErrorFactory.getError(errorType);
         if (error) {
             error.setDetails(message);
             res.status(HttpStatusCode[errorType]).json(error);
