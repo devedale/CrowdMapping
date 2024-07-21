@@ -10,6 +10,7 @@ export default (app: Express) =>{
     app.post(`${base_url}`, authMiddleware, reportService.createReport);
     app.patch(`${base_url}/:id/reject`, authMiddleware, reportService.rejectReport);
     app.patch(`${base_url}/:id/validate`, authMiddleware, reportService.validateReport);
+    app.patch(`${base_url}/bulk_update`, authMiddleware, reportService.bulkUpdateReport);
 }
 
 

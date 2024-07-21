@@ -17,8 +17,8 @@ class UserRepository {
             }
             data.roleId = role.id;
             const user = await User.dao.create(data);
-            console.log("User creato");
-            console.log(user);
+            
+            
             return user as User;
         } catch (error) {
             console.error(error);
@@ -75,9 +75,9 @@ class UserRepository {
     }
     async updateUser(user: User, data: Partial<ICreateUser>): Promise<void> {
         try {
-            await user.update(data);
+            
+            await User.dao.update(user, data);
             console.log("Utente aggiornato:", user);
-            await User.dao.update(user, data); // Aggiorna anche nella cache
         } catch (error) {
             console.error(error);
             throw new Error("Aggiornamento utente fallito");
@@ -85,9 +85,8 @@ class UserRepository {
     }
     async deleteUser(user: User): Promise<void> {
         try {
-            await user.destroy();
+            await User.dao.delete(user);
             console.log("Utente eliminato:", user);
-            await User.dao.delete(user); // Rimuovi anche dalla cache
         } catch (error) {
             console.error(error);
             throw new Error("Eliminazione utente fallita");

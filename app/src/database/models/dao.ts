@@ -121,7 +121,7 @@ export class Dao<T extends Model> implements DaoI<T> {
     }
 
     private async invalidateCache(instance: T): Promise<void> {
-        const id = (instance as any).id as number; // Assuming ID is directly accessible as a property
+        const id = (instance as any).id as number;
         const cacheKey = this.generateCacheKey(id);
         try {
             await deleteFromCache(cacheKey);

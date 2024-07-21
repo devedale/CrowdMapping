@@ -18,8 +18,14 @@ class UserService {
             return res.status(400).json({ success: false, message: 'Email and password are required' });
         }
     
-        try {    
+        try {   
+            if (await userRepository.getUserByEmail(email)){ 
+                return res.status(409).json(ErrorFactory
+                .getError(HttpStatusCode.Conflict)
+                .setDetails('Utente gia registrato')
+            );};
             const newUser = await userRepository.createUser({ nickname, email, password });
+
             res.status(200).json({ success: true, message: 'Registrazione completata', user: newUser });
         } catch (error) {
             next(ErrorFactory

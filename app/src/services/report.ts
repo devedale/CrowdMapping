@@ -1,10 +1,11 @@
+import { Request, Response, NextFunction } from 'express';
 import { ReportRepository, ICreateReport } from "../database/repository/report";
-import { ReportType, Severity } from "../database/models/report";
+import { ReportType, Severity, ReportStatus } from "../database/models/report";
 import { ErrorFactory } from '../errors/ErrorFactory';
+import { res_build } from '../errors/ErrorFactory';
 import { HttpStatusCode } from '../errors/HttpStatusCode';
-import {
-    id
-} from '../../../../.vscode-server/extensions/visualstudioexptteam.vscodeintellicode-1.3.1/dist/939.intellicode';
+import { resBuild } from '../errors/ErrorFactory';
+
 const reportRepository = new ReportRepository();
 
 class ReportService {
@@ -142,21 +143,58 @@ class ReportService {
                         .setDetails('Fornire id Report da aggiornare')
                     );
             }
+            if (isNaN(parseInt(id))) {
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Id non valido')
+                    );
+            }
+            const report = await reportRepository.getReportById(id)
+            if (report === null) {
+                return res
+                .status(HttpStatusCode.NotFound)
+                .json(ErrorFactory
+                    .getError(HttpStatusCode.NotFound)
+                    .setDetails('Report da aggiornare non presente')
+                );
+            }
+
+            if (report.status === ReportStatus.PENDING) {
+                await reportRepository.validateReport(id)
+                } else {
+
+                    //return resBuild(res,"BadRequest", `Lo status del report è gia su ${report.status}`)
+                    return res.build("BadRequest", `Lo status del report è gia su ${report.status}`)
+
+                    /*
+                    return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails(`Lo status del report è gia su ${report.status}`));
+                    */
+                
+                
+                }
+
             if (await reportRepository.validateReport(id)){
             res.status(200).json({ success: true, message: `Report ${id} validated` });
             }
         } catch (err) {
+            console.log(err)
             next(ErrorFactory
                 .getError(HttpStatusCode.InternalServerError)
                 .setDetails('Errore durante l\'aggiornamento del report.')
                 .setErrorDetail(err)
             );
         }
-    
     }
+
     async rejectReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const { id } = req.body;
+            const id = req.params.id;
             if (!id) {
                 return res
                     .status(HttpStatusCode.BadRequest)
@@ -165,8 +203,32 @@ class ReportService {
                         .setDetails('Fornire id Report da aggiornare')
                     );
             }
-            await reportRepository.rejectReport(id)
-            res.status(200).json({ success: true, message: `Report ${id} rejected` });
+            if (isNaN(parseInt(id))) { 
+                return res
+                    .status(HttpStatusCode.BadRequest)
+                    .json(ErrorFactory
+                        .getError(HttpStatusCode.BadRequest)
+                        .setDetails('Id non valido')
+                    );
+            }
+
+            const report = await reportRepository.getReportById(id)
+            if (report === null) {
+                return res
+                .status(HttpStatusCode.NotFound)
+                .json(ErrorFactory
+                    .getError(HttpStatusCode.NotFound)
+                    .setDetails('Report da aggiornare non presente')
+                );
+            }
+            if (report.status === ReportStatus.PENDING) {
+                }
+
+
+
+            if (await reportRepository.rejectReport(id)){
+                res.status(200).json({ success: true, message: `Report ${id} rejected` });
+                }
         } catch (err) {
             next(ErrorFactory
                 .getError(HttpStatusCode.InternalServerError)
@@ -177,25 +239,42 @@ class ReportService {
     }
     async bulkUpdateReport(req: Request, res: Response, next: NextFunction) {
         try {
-            const { validate_ids, reject_ids} = req.body;
-            if (!validate_ids || !reject_ids) {
+            console.log("Request body:", req.body);
+            const validate_ids = req.body.validate_ids
+            const reject_ids = req.body.reject_ids;
+            
+            console.log("Initial validate_ids, reject_ids");
+            console.log(validate_ids, reject_ids);
+            console.log("Type of validate_ids:", typeof validate_ids);
+            console.log("Type of reject_ids:", typeof reject_ids);
+            console.log("Instance of validate_ids:", validate_ids instanceof Array);
+            console.log("Instance of reject_ids:", reject_ids instanceof Array);
+            console.log("Length of validate_ids:", validate_ids.length);
+            console.log("Length of reject_ids:", reject_ids.length);
+            console.log("Validate_ids:", validate_ids[0]);
+            console.log("Reject_ids:", reject_ids[0]);
+            // Check if both validate_ids and reject_ids are arrays
+            if (!Array.isArray(validate_ids) || !Array.isArray(reject_ids)) {
                 return res
                     .status(HttpStatusCode.BadRequest)
                     .json(ErrorFactory
                         .getError(HttpStatusCode.BadRequest)
-                        .setDetails('Fornire un request body {validate_ids: number[], reject_ids: number[]}')
+                        .setDetails('Provide a request body { validate_ids: number[], reject_ids: number[] }')
                     );
             }
-            const results = await reportRepository.bulkUpdateReport(req.body)
-            res.status(200).json({ success: true, message: `Results: ${results}` });
+
+            const results = await reportRepository.bulkUpdateReport(validate_ids, reject_ids );
+            res.status(200).json({ success: true, message: `Results: validated: ${results.validated},  rejected: ${results.rejected}` });
         } catch (err) {
+            console.log(err);
             next(ErrorFactory
                 .getError(HttpStatusCode.InternalServerError)
-                .setDetails('Errore durante l\'aggiornamento dei report.')
+                .setDetails('Error during report update.')
                 .setErrorDetail(err)
             );
         }
     }
+        
 }
 
 export default ReportService;
