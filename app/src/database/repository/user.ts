@@ -1,35 +1,30 @@
 import { User } from "../models/user";
-import { Role } from "../models/role"; // Assicurati di importare il modello Role
+import { RoleRepository } from "./role"; 
 
 interface ICreateUser {
     nickname: string;
     email: string;
     password: string;
 }
+const roleRepository =new RoleRepository();
 
 class UserRepository {
     async createUser(data: ICreateUser): Promise<User> {
         try {
-            const role = await Role.findOne({ where: { name: 'user' } });
-
-            if (!role) {
-                throw new Error('Ruolo "user" non trovato');
-            }
-            data.roleId = role.id;
             const user = await User.dao.create(data);
             
-            
             return user as User;
+        
         } catch (error) {
             console.error(error);
             throw new Error("Creazione user fallita");
         }
     }
 
-    async createAdmin(data: ICreateUser): Promise<User> {
+    async createAdmin(data: ICreateUser): Promise<User> { // MANCA SERVICE REGISTER ADMIN
         try {
             // Cerca il ruolo con nome "admin"
-            const role = await Role.findOne({ where: { name: 'admin' } });
+            const role = await roleRepository.getRoleByName('admin');
 
             if (!role) {
                 throw new Error('Ruolo "admin" non trovato');
@@ -55,7 +50,7 @@ class UserRepository {
             throw new Error("Recupero utente per ID fallito");
         }
     }
-    async getUserByEmail(email: string): Promise<User | null> {
+    async getUserByEmail(email: string): Promise<User | null> { // MANCA GESTIONE CACHE
         try {
             const user = await User.findOne({ where: { email } });
             return user as User | null;
@@ -73,20 +68,23 @@ class UserRepository {
             throw new Error("Recupero utenti fallito");
         }
     }
-    async updateUser(user: User, data: Partial<ICreateUser>): Promise<void> {
+    async updateUser(user: User, data: Partial<ICreateUser>): Promise<0 | 1> {
         try {
             
-            await User.dao.update(user, data);
-            console.log("Utente aggiornato:", user);
+            console.log("Aggiornamento utente:", user);
+            return await User.dao.update(user, data) as 0 | 1;
+            
         } catch (error) {
             console.error(error);
             throw new Error("Aggiornamento utente fallito");
         }
     }
-    async deleteUser(user: User): Promise<void> {
+    async deleteUser(user: User): Promise<0 | 1> {
         try {
-            await User.dao.delete(user);
-            console.log("Utente eliminato:", user);
+            
+            console.log("Eliminazione utente:", user);
+            return await User.dao.delete(user) as 0 | 1;
+            
         } catch (error) {
             console.error(error);
             throw new Error("Eliminazione utente fallita");

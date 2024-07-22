@@ -1,5 +1,5 @@
 import { User } from "../models/user";
-import { Role } from "../models/role"; 
+import { RoleRepository } from "./role"; 
 import { Report, ReportStatus } from "../models/report";
 
 interface ICreateReport {
@@ -12,12 +12,7 @@ interface ICreateReport {
 class ReportRepository {
     async createReport(data: ICreateReport): Promise<Report> {
         try {
-            if (!data.date) {
-                data.date = new Date();
-            }
             const report = await Report.dao.create(data);
-            console.log("Report creato");
-            console.log(report);
             return report as Report;
         } catch (error) {
             console.error(error);
@@ -45,7 +40,7 @@ class ReportRepository {
     async updateReport(report: Report, data: Partial<ICreateReport>):Promise<0 | 1> {
         try {
             console.log(`Report : ${report}, data : ${data}`);
-            return await Report.dao.update(report, data);
+            return await Report.dao.update(report, data) as 0 | 1
             
 
         } catch (error) {
@@ -53,10 +48,11 @@ class ReportRepository {
             throw new Error("Aggiornamento report fallito");
         }
     }
-    async deleteReport(report: Report): Promise<void> {
+    async deleteReport(report: Report): Promise<0 | 1> {
         try {
-            await Report.dao.delete(report);
-            console.log("Utente eliminato:", report);
+            console.log("Eliminazione report:", report);
+
+            return await Report.dao.delete(report) as 0 | 1
             
         } catch (error) {
             console.error(error);
@@ -68,7 +64,7 @@ class ReportRepository {
             const report = await this.getReportById(id);
             console.log(`Updating status to: ${ReportStatus.VALIDATED}`);
 
-            return await this.updateReport(report, {status: ReportStatus.VALIDATED})
+            return await this.updateReport(report, {status: ReportStatus.VALIDATED}) as 0 | 1
 
         } catch (error) {
             console.error(error);
@@ -81,7 +77,7 @@ class ReportRepository {
             const report = await this.getReportById(id);
             console.log(`Updating status to: ${ReportStatus.REJECTED}`);
 
-            return await this.updateReport(report, {status: ReportStatus.REJECTED})
+            return await this.updateReport(report, {status: ReportStatus.REJECTED}) as 0 | 1
             
         } catch (error) {
             console.error(error);
@@ -93,7 +89,7 @@ class ReportRepository {
             const report = await this.getReportById(id);
             console.log(`Updating status to: ${ReportStatus.PENDING}`);
 
-            return await this.updateReport(report, {status: ReportStatus.PENDING})
+            return await this.updateReport(report, {status: ReportStatus.PENDING}) as 0 | 1
 
         } catch (error) {
             console.error(error);
@@ -125,7 +121,7 @@ class ReportRepository {
                     
                 }
             }
-            return { validated: validate_ids, rejected: reject_ids };
+            return { validated: validate_ids, rejected: reject_ids } as { validated: number[], rejected: number[] };
 
         } catch (error) {
             console.error(error);

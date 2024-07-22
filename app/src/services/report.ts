@@ -12,6 +12,9 @@ class ReportService {
         const { date, position, type, severity} = req.body;
 
         try {  
+            if (!date) {
+                date = new Date();
+            }
 
             if (date.length<10||isNaN(Date.parse(date))) {
 
@@ -43,7 +46,7 @@ class ReportService {
             const status = "PENDING"
             const newReport = await reportRepository.createReport({ userId, date, position, type, severity, status});
 
-            res.status(200).json({ success: true, message: 'Report Creato', report: newReport });
+            res.status(201).json({ success: true, message: 'Report Creato', report: newReport });
 
         } catch (err) {
 

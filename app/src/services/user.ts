@@ -1,6 +1,6 @@
 import { UserRepository, ICreateUser } from "../database/repository/user";
-import { ErrorFactory } from '../errors/ErrorFactory';
-import { HttpStatusCode } from '../errors/HttpStatusCode';
+import { RoleRepository} from "../database/repository/role";
+import { ISError } from '../errors/ErrorFactory';
 import jwt, { JwtPayload } from "jsonwebtoken";
 import fs from 'fs'
 
@@ -9,30 +9,36 @@ const jwt_exp_h =  parseInt(process.env.JWT_EXP_H) || 1;
 
 
 const userRepository = new UserRepository();
+const roleRepository = new RoleRepository();
 
 class UserService {
     async registerUser(req: Request, res: Response, next: NextFunction) {
         const { nickname, email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ success: false, message: 'Email and password are required' });
+
+            return res.build('BadRequest','Email and password are required in the request body');
+        
         }
     
         try {   
-            if (await userRepository.getUserByEmail(email)){ 
-                return res.status(409).json(ErrorFactory
-                .getError(HttpStatusCode.Conflict)
-                .setDetails('Utente gia registrato')
-            );};
-            const newUser = await userRepository.createUser({ nickname, email, password });
+            if (await userRepository.getUserByEmail(email)) { 
 
-            res.status(200).json({ success: true, message: 'Registrazione completata', user: newUser });
+                return res.build('Conflict','Utente gia registrato');
+
+            };
+            const desiredRole = 'user';
+            const role = await roleRepository.getRoleByName(desiredRole);
+            if (!role) {
+
+                return res.build('BadRequest',`Il ruolo "user" non esiste`);
+            
+            }
+            const roleId = role.id;
+            const newUser = await userRepository.createUser({ nickname, email, password, roleId });
+            res.status(201).json({ success: true, message: 'Registrazione completata', user: newUser });
         } catch (error) {
-            next(ErrorFactory
-                .getError(HttpStatusCode.InternalServerError)
-                .setDetails('Errore durante la registrazione.')
-                .setErrorDetail(error)
-            );    
+            next(ISError('Errore durante la registrazione.',err));    
         } 
     }
 
@@ -42,23 +48,17 @@ class UserService {
         try {
             const user = await userRepository.getUserByEmail(email);
             if (!user) {
-                return res
-                    .status(HttpStatusCode.BadRequest)
-                    .json(ErrorFactory
-                        .getError(HttpStatusCode.BadRequest)
-                        .setDetails('Utente non trovato')
-                    );
+
+                return res.build('BadRequest','Utente non trovato');
+            
             }
 
             // Verifica della password
             const isValidPassword = await user.comparePassword(password);
             if (!isValidPassword) {
-                return res
-                    .status(HttpStatusCode.Unauthorized)
-                    .json(ErrorFactory
-                        .getError(HttpStatusCode.Unauthorized)
-                        .setDetails('Password non valida')
-                    );
+
+                return res.build('Unauthorized','Password non valida');
+            
             }
 
             let token;
@@ -81,11 +81,9 @@ class UserService {
             res.status(200).json({ success: true, message: 'Accesso riuscito', token });
 
         } catch (err) {
-            next(ErrorFactory
-                .getError(HttpStatusCode.InternalServerError)
-                .setDetails('Errore durante il login.')
-                .setErrorDetail(err)
-            );
+
+            next(ISError('Errore durante il login.',err));
+        
         }
     }
 
@@ -93,21 +91,17 @@ class UserService {
         try {
             const users = await userRepository.getUsers();
             if (!users) {
-                return res
-                    .status(HttpStatusCode.NotFound)
-                    .json(ErrorFactory
-                        .getError(HttpStatusCode.NotFound)
-                        .setDetails('Utenti non trovati')
-                    );
+
+                return res.build('NotFound','Utenti non trovati');
+      
             }
 
-            res.json({ success: true, message: 'Lista Utenti', users });
+            res.status(200).json({ success: true, message: 'Lista Utenti', users });
+
         } catch (err) {
-            next(ErrorFactory
-                .getError(HttpStatusCode.InternalServerError)
-                .setDetails('Errore durante il recupero utenti.')
-                .setErrorDetail(err)
-            );
+
+            next(ISE('Errore durante il recupero utenti.'),err);
+        
         }
     }
 }
