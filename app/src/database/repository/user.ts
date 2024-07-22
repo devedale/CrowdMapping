@@ -43,13 +43,21 @@ class UserRepository {
     }
     async getUserById(id: number): Promise<User | null> {
         try {
-            const user = await User.dao.get(id);
-            return user as User | null;
+            if (await this.userIdExist(id)){
+                const user = await User.dao.get(id);
+                return user as User | null;
+            }
+
         } catch (error) {
             console.error(error);
             throw new Error("Recupero utente per ID fallito");
         }
     }
+    async userIdExist(userId: number): Promise<boolean> { // MANCA GESTIONE CACHE
+        const count = await User.count({ where: { id: userId } });
+        return count > 0;
+      }
+
     async getUserByEmail(email: string): Promise<User | null> { // MANCA GESTIONE CACHE
         try {
             const user = await User.findOne({ where: { email } });

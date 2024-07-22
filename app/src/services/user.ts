@@ -13,6 +13,7 @@ const roleRepository = new RoleRepository();
 
 class UserService {
     async registerUser(req: Request, res: Response, next: NextFunction) {
+        req.validate(['nickname','email','password']);
         const { nickname, email, password } = req.body;
 
         if (!email || !password) {
@@ -43,6 +44,7 @@ class UserService {
     }
 
     async loginUser(req: Request, res: Response, next: NextFunction) {
+        req.validate(['email','password']);
         const { email, password } = req.body;
 
         try {

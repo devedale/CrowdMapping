@@ -9,6 +9,7 @@ interface ICreateReport {
     private severity!: Severity.Pothole | Severity.Dip;
 }
 
+
 class ReportRepository {
     async createReport(data: ICreateReport): Promise<Report> {
         try {
@@ -19,15 +20,26 @@ class ReportRepository {
             throw new Error("Creazione report fallita");
         }
     }
+    async reportIdExist(reportId: number): Promise<boolean> { // MANCA GESTIONE CACHE
+        const count = await Report.count({ where: { id: reportId } });
+        return count > 0;
+      }
+
     async getReportById(id: number): Promise<Report | null> {
         try {
-            const report = await Report.dao.get(id);
-            return report as Report | null;
+            if (await this.reportIdExist(id)) {
+                const report = await Report.dao.get(id);
+                return report as Report | null;
+            }
+
         } catch (error) {
+            console.error('\n\n\n\n\nerror\n\n\n\n\n');
             console.error(error);
             throw new Error("Recupero report per ID fallito");
         }
     }
+
+
     async getReports(): Promise<Report[] | null> {
         try {
             const reports = await Report.dao.getAll();
@@ -101,6 +113,7 @@ class ReportRepository {
             try{
             for (let i = 0; i <validate_ids.length; i++) {
                 try {
+                    const id = validate_ids[i];
 
                     await this.validateReport(id)
                     console.log(`Report ${id} status updated to ${ReportStatus.VALIDATED}`);
@@ -112,6 +125,9 @@ class ReportRepository {
             }
             for (let i = 0; i <reject_ids.length; i++) {
                 try {
+
+                    const id = reject_ids[i];
+
 
                     await this.rejectReport(id)
                     console.log(`Report ${id} status updated to ${ReportStatus.REJECTED}`);

@@ -1,6 +1,5 @@
 import jwt from 'jsonwebtoken';
-import { ErrorFactory } from '../errors/ErrorFactory';
-import { HttpStatusCode } from '../errors/HttpStatusCode';
+import { ISError } from '../errors/ErrorFactory';
 import fs from 'fs';
 
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'my_jwt_secret_key';
@@ -8,15 +7,13 @@ const RSA_AUTH = process.env.RSA_AUTH == 'true' || process.env.RSA_AUTH == 'test
 
 
 const authHMACMiddleware = (req: Request, res: Response, next: NextFunction) => {
+
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-        return res
-            .status(HttpStatusCode.Unauthorized)
-            .json(ErrorFactory
-                .getError(HttpStatusCode.Unauthorized)
-                .setDetails('La richiesta non ha il token nell\'header.')
-            );
+
+        return res.build('Unauthorized','La richiesta non ha il token nell\'header.');
+
     }
 
     try {
@@ -27,12 +24,7 @@ const authHMACMiddleware = (req: Request, res: Response, next: NextFunction) => 
         next();
     } catch (err) {
         console.log(err);
-        return res
-        .status(HttpStatusCode.Forbidden)
-        .json(ErrorFactory
-            .getError(HttpStatusCode.Forbidden)
-            .setDetails('Il token non è valido.')
-        );
+        return res.build('Forbidden','Il token non è valido.');
     }
 };
 
@@ -40,12 +32,9 @@ const authRSAMiddleware = async (req, res, next) => {
     const token = req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-        return res
-        .status(HttpStatusCode.Unauthorized)
-        .json(ErrorFactory
-            .getError(HttpStatusCode.Unauthorized)
-            .setDetails('La richiesta non ha il token nell\'header.')
-        );
+
+        return res.build('Unauthorized','La richiesta non ha il token nell\'header.');
+    
     }
 
     try {
@@ -56,13 +45,11 @@ const authRSAMiddleware = async (req, res, next) => {
         console.log('\ndecoded', decoded,'\n');
         next();
     } catch (err) {
+
         console.log(err);
-        return res
-        .status(HttpStatusCode.Forbidden)
-        .json(ErrorFactory
-            .getError(HttpStatusCode.Forbidden)
-            .setDetails('Il token non è valido.')
-        );
+        
+        return res.build('Forbidden','Il token non è valido.');
+    
     }
 };
 
