@@ -10,6 +10,8 @@ class User extends Model {
     private nickname!: string;
     private password!: string;
     private roleId!: number;
+    private balance!: number;
+    private validated!: number;
     public dao!: Dao<User>;
 
     static initialize(): void {
@@ -42,6 +44,16 @@ class User extends Model {
                         key: 'id',
                     },
                     allowNull: false,
+                },
+                balance: {
+                    type: DataTypes.DECIMAL(10, 2),
+                    allowNull: false,
+                    defaultValue: 0.00
+                },
+                validated: {
+                    type: DataTypes.INTEGER,
+                    allowNull: false,
+                    defaultValue: 0
                 },
                 createdAt: {
                     type: DataTypes.DATE,

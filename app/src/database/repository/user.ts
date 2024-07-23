@@ -98,6 +98,43 @@ class UserRepository {
             throw new Error("Eliminazione utente fallita");
         }
     }
+    async userValidatePoint(userId: number): Promise<0 | 1> {
+        try {
+            const user = await this.getUserById(userId)
+            const validated  = user.validated + 1
+            console.log("Consegna punti validazione utente:", user);
+            return await this.updateUser(user,{ validated }) as 0 | 1;
+            
+        } catch (error) {
+            console.error(error);
+            throw new Error("Consegna punti validazione utente fallita");
+        }
+    }
+    async userTokenPoints(userId: number): Promise<0 | 1> {
+        try {
+            
+            const user = await this.getUserById(userId)
+            let reward
+            !(user.validated>10)? reward = 0.1 : reward = 0.15
+            const balance  = parseFloat(user.balance) + parseFloat(reward)
+            console.log("Ricompensa TokenPoints utente:", balance);
+            return await this.updateUser(user,{ balance }) as 0 | 1;
+            
+        } catch (error) {
+            console.error(error);
+            throw new Error("Consegna TokenPoints utente fallita");
+        }
+    }
+    async userReward(userId: number): Promise<0 | 1> {
+        try {
+            await this.userValidatePoint(userId);
+            await this.userTokenPoints(userId);
+            
+        } catch (error) {
+            console.error(error);
+            throw new Error("Ricompensa utente fallita");
+        }
+    }
 }
 
 export { UserRepository };

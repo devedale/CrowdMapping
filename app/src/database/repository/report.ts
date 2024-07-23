@@ -1,6 +1,9 @@
 import { User } from "../models/user";
 import { RoleRepository } from "./role"; 
 import { Report, ReportStatus } from "../models/report";
+import { UserRepository } from "./user"; 
+
+const userRepository =new UserRepository();
 
 interface ICreateReport {
     private date?: Date;
@@ -75,8 +78,9 @@ class ReportRepository {
         try {
             const report = await this.getReportById(id);
             console.log(`Updating status to: ${ReportStatus.VALIDATED}`);
-
-            return await this.updateReport(report, {status: ReportStatus.VALIDATED}) as 0 | 1
+            const results = await this.updateReport(report, {status: ReportStatus.VALIDATED}) 
+            await userRepository.userReward(report.userId)
+            return results
 
         } catch (error) {
             console.error(error);

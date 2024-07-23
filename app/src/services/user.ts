@@ -36,7 +36,9 @@ class UserService {
             
             }
             const roleId = role.id;
-            const newUser = await userRepository.createUser({ nickname, email, password, roleId });
+            const balance = 0;
+            const validated = 0;
+            const newUser = await userRepository.createUser({ nickname, email, password, roleId, balance, validated });
             res.status(201).json({ success: true, message: 'Registrazione completata', user: newUser });
         } catch (error) {
             next(ISError('Errore durante la registrazione.',err));    
