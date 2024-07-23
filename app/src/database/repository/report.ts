@@ -148,6 +148,7 @@ class ReportRepository {
             throw new Error("Bulk report status update failed");
         }
     }
+    
 }
 
 export { ReportRepository };

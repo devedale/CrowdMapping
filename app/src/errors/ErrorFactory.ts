@@ -35,5 +35,6 @@ export class ErrorFactory {
 }
 
 export function ISError(details: string, error: any): Errors.ErrorMsg {
+    console.error(error);
     return new Errors.InternalServerError().setDetails(details).setErrorDetail(error);
 }

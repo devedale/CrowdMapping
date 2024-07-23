@@ -10,7 +10,7 @@ class User extends Model {
     private nickname!: string;
     private password!: string;
     private roleId!: number;
-    private balance!: number;
+    private coins!: number;
     private validated!: number;
     public dao!: Dao<User>;
 
@@ -45,7 +45,7 @@ class User extends Model {
                     },
                     allowNull: false,
                 },
-                balance: {
+                coins: {
                     type: DataTypes.DECIMAL(10, 2),
                     allowNull: false,
                     defaultValue: 0.00

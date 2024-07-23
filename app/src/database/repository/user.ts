@@ -6,6 +6,12 @@ interface ICreateUser {
     email: string;
     password: string;
 }
+
+interface UserRank {
+    nickname: string;
+    coins: number;
+}
+
 const roleRepository =new RoleRepository();
 
 class UserRepository {
@@ -116,9 +122,9 @@ class UserRepository {
             const user = await this.getUserById(userId)
             let reward
             !(user.validated>10)? reward = 0.1 : reward = 0.15
-            const balance  = parseFloat(user.balance) + parseFloat(reward)
-            console.log("Ricompensa TokenPoints utente:", balance);
-            return await this.updateUser(user,{ balance }) as 0 | 1;
+            const coins  = parseFloat(user.coins) + parseFloat(reward)
+            console.log("Ricompensa TokenPoints utente:", coins);
+            return await this.updateUser(user,{ coins }) as 0 | 1;
             
         } catch (error) {
             console.error(error);
@@ -135,6 +141,28 @@ class UserRepository {
             throw new Error("Ricompensa utente fallita");
         }
     }
+    async usersRankList(sortOrder: 'asc' | 'desc' = 'desc'): Promise<UserRank[] | null> {
+        try {
+            const users = await this.getUsers();
+            
+            const mappedUsers = users.map((user) => ({ nickname: user.nickname, coins: user.coins }));
+            
+            mappedUsers.sort((a, b) => {
+                if (sortOrder === 'asc') {
+                    return a.coins - b.coins;
+                } else {
+                    return b.coins - a.coins;
+                }
+            });
+
+            return mappedUsers;
+        
+        } catch (error) {
+            console.error(error);
+            throw new Error("Recupero graduatoria fallito");
+        }
+    }
+    
 }
 
 export { UserRepository };

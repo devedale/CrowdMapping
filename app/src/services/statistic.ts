@@ -1,16 +1,76 @@
 import { Request, Response, NextFunction } from 'express';
-import { ReportRepository, ICreateReport } from "../database/repository/report";
-import { RoleRepository } from "../database/repository/role";
 import { ReportType, Severity, ReportStatus } from "../database/models/report";
 import { ExportService } from "./export";
 import { ISError } from '../errors/ErrorFactory';
 
-const reportRepository = new ReportRepository();
-const roleRepository = new RoleRepository();
 
-class ReportService {
+class StatisticService {
 
-    async createReport(req: Request, res: Response, next: NextFunction) {
+
+
+
+
+
+
+    
+
+    const statusCounts = () => {
+        const counts = {};
+
+        const addSeverityCounts = (type, severityEnum) => {
+            counts[type] = {};
+            Object.values(severityEnum).forEach(severity => {
+                counts[type][severity] = {
+                    [ReportStatus.PENDING]: 0,
+                    [ReportStatus.REJECTED]: 0,
+                    [ReportStatus.VALIDATED]: 0
+                };
+            });
+        };
+
+        addSeverityCounts(ReportType.POTHOLE, Severity.Pothole);
+        addSeverityCounts(ReportType.DIP, Severity.Dip);
+
+        return counts;
+    };
+
+    const initialCounts = generateInitialCounts();
+
+
+
+
+
+
+
+
+
+    async generateInitialCounts() {
+
+        const counts = {};
+
+        const addSeverityCounts = (type, severityEnum) => {
+            counts[type] = {};
+            Object.values(severityEnum).forEach(severity => {
+                counts[type][severity] = {
+                    [ReportStatus.PENDING]: 0,
+                    [ReportStatus.REJECTED]: 0,
+                    [ReportStatus.VALIDATED]: 0
+                };
+            });
+        };
+
+        addSeverityCounts(ReportType.POTHOLE, Severity.Pothole);
+        addSeverityCounts(ReportType.DIP, Severity.Dip);
+
+        return counts;
+
+
+    }
+
+
+
+
+
         req.validate(['date','position','type','severity']);
         const { date, position, type, severity} = req.body;
 

@@ -36,9 +36,9 @@ class UserService {
             
             }
             const roleId = role.id;
-            const balance = 0;
+            const coins = 0;
             const validated = 0;
-            const newUser = await userRepository.createUser({ nickname, email, password, roleId, balance, validated });
+            const newUser = await userRepository.createUser({ nickname, email, password, roleId, coins, validated });
             res.status(201).json({ success: true, message: 'Registrazione completata', user: newUser });
         } catch (error) {
             next(ISError('Errore durante la registrazione.',err));    
@@ -104,7 +104,26 @@ class UserService {
 
         } catch (err) {
 
-            next(ISE('Errore durante il recupero utenti.'),err);
+            next(ISError('Errore durante il recupero utenti.'),err);
+        
+        }
+    }
+
+    async getUsersRankList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const order = req.query.order === 'asc' ? 'asc' : 'desc';
+            const rankList = await userRepository.usersRankList(order);
+            if (!rankList) {
+
+                return res.build('NotFound','Utenti non trovati');
+      
+            }
+
+            res.status(200).json({ success: true, message: 'Rank List:', rankList });
+
+        } catch (err) {
+
+            next(ISError('Errore durante il recupero della RankList.'),err);
         
         }
     }

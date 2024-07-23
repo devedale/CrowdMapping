@@ -3,11 +3,14 @@ import ReportService from '../services/report';
 
 
 export default (app: Express) =>{
+
     const reportService = new ReportService();
     const base_url = `${process.env.API_VERSION || '/api'}/reports`;
     app.get(`${base_url}`, authMiddleware, reportService.getReports);
     app.patch(`${base_url}/bulk_update`, authMiddleware, reportService.bulkUpdateReport);
     app.get(`${base_url}/my_reports`, authMiddleware, reportService.getMyReports);
+    app.get(`${base_url}/statistics`, reportService.exportReportStatistics);
+    app.get(`${base_url}/statistics/:format`, reportService.exportReportStatistics);
     app.get(`${base_url}/:id`, authMiddleware, reportService.getReportById);
     app.post(`${base_url}`, authMiddleware, reportService.createReport);
     app.patch(`${base_url}/:id`, authMiddleware, reportService.updateReport);
