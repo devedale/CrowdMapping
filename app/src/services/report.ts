@@ -8,7 +8,20 @@ import { ISError } from '../errors/ErrorFactory';
 const reportRepository = new ReportRepository();
 const roleRepository = new RoleRepository();
 
+
+
+interface StatusCounts {
+    [type: string]: {
+        [severity: string]: {
+            [status: string]: number;
+        };
+    };
+}
+
 class ReportService {
+    constructor(){
+        this.exportReportStatistics = this.exportReportStatistics.bind(this);
+    }
 
     async createReport(req: Request, res: Response, next: NextFunction) {
         req.validate(['date','position','type','severity']);
@@ -349,81 +362,77 @@ class ReportService {
 
 
     }
+
     async exportReportStatistics(req: Request, res: Response, next: NextFunction) {
         try {
-            
-            
             const format = req.params.format;
+
             if (!['json', 'csv', 'pdf', undefined].includes(format)) {
-
                 return res.build("BadRequest", 'Formato non valido');
-            
             }
-            const reports = await reportRepository.getReports();
 
-            const generateInitialCounts = () => {
-                const counts = {};
-    
-                const addSeverityCounts = (type, severityEnum) => {
-                    counts[type] = {};
-                    Object.values(severityEnum).forEach(severity => {
-                        counts[type][severity] = {
-                            [ReportStatus.PENDING]: 0,
-                            [ReportStatus.REJECTED]: 0,
-                            [ReportStatus.VALIDATED]: 0
-                        };
-                    });
-                };
-        
-                addSeverityCounts(ReportType.POTHOLE, Severity.Pothole);
-                addSeverityCounts(ReportType.DIP, Severity.Dip);
-        
-                return counts;
-            };
-        
-            const initialCounts = generateInitialCounts();
-        
-            const statusCounts = reports.reduce((counts, report) => {
-                const { type, severity, status } = report;
-                if (counts[type] && counts[type][severity] && counts[type][severity][status] !== undefined) {
-                    counts[type][severity][status]++;
-                }
-                return counts;
-            }, initialCounts);
+            const statusCounts = await this.generateInitialStatusCounts();
 
-
-            if (format!==undefined) {
-                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1) as keyof ExportService}`
-                console.log('statusCounts')
-                console.log(statusCounts)
+            if (format !== undefined) {
+                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
                 const exportService = new ExportService(statusCounts);
-                
-    
+
                 if (typeof exportService[methodName] === 'function') {
                     const fileBuffer = await exportService[methodName]();
-                    const contentType = format === 'pdf' ? 'application/pdf' : format === 'csv' ? 'text/csv' : 'application/json';
-                    const fileExtension = format === 'pdf' ? 'pdf' : format === 'csv' ? 'csv' : 'json';
-        
-                    res.setHeader('Content-Disposition', `attachment; filename=export.${fileExtension}`);
-                    res.setHeader('Content-Type', contentType);
-                    res.send(fileBuffer);
+                    return res.sendFile(fileBuffer, format);
+                } else {
+                    return res.build("BadRequest", 'Formato non valido');
+                }
             }
-            
 
-            }
-            if (format === undefined){
-
+            if (format === undefined) {
                 return res.status(200).json({ success: true, message: 'Report statistics', statusCounts });
-            
             }
-            
+
             next();
         } catch (err) {
             console.log(err);
-            next(ISError('errore durante il recupero delle statistiche',err));
+            next(ISError('errore durante il recupero delle statistiche', err));
         }
-        
-    }   
+    }
+
+    async generateInitialStatusCounts():Promise<StatusCount> {
+        const reports = await reportRepository.getReports();
+
+        const generateInitialCounts = () => {
+            const counts = {};
+
+            const addSeverityCounts = (type, severityEnum) => {
+                counts[type] = {};
+                Object.values(severityEnum).forEach(severity => {
+                    counts[type][severity] = {
+                        [ReportStatus.PENDING]: 0,
+                        [ReportStatus.REJECTED]: 0,
+                        [ReportStatus.VALIDATED]: 0
+                    };
+                });
+            };
+
+            addSeverityCounts(ReportType.POTHOLE, Severity.Pothole);
+            addSeverityCounts(ReportType.DIP, Severity.Dip);
+
+            return counts;
+        };
+
+        const initialCounts = generateInitialCounts();
+
+        const statusCounts = reports.reduce((counts, report) => {
+            const { type, severity, status } = report;
+            if (counts[type] && counts[type][severity] && counts[type][severity][status] !== undefined) {
+                counts[type][severity][status]++;
+            }
+            return counts;
+        }, initialCounts);
+
+        return statusCounts;
+    }
+
+
 }
 
 export default ReportService;
