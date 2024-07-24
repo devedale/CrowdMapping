@@ -64,7 +64,7 @@ class Report extends Model {
                     defaultValue: DataTypes.NOW
                 },
                 position: {
-                    type: DataTypes.GEOMETRY('POINT'),
+                    type: DataTypes.GEOMETRY('POINT', 4326),
                     allowNull: false
                 },
                 type: {

@@ -3,7 +3,7 @@ import { RoleRepository } from "./role";
 import { Report, ReportStatus, ReportType, Severity } from "../models/report";
 import { UserRepository } from "./user"; 
 import { DBSCAN } from 'density-clustering';
-
+import { getDistance } from 'geolib';
 
 const userRepository =new UserRepository();
 
@@ -29,6 +29,20 @@ interface IClusterResult {
     clusters: number[][];
     noise: number[][];
 }
+
+const haversineDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
+    const R = 6371000; // Raggio della Terra in metri
+    const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+    
+    const dLat = toRadians(lat2 - lat1);
+    const dLon = toRadians(lon2 - lon1);
+    const a = Math.sin(dLat / 2) ** 2 +
+              Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+              Math.sin(dLon / 2) ** 2;
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+    return R * c;
+};
 
 class ReportRepository {
     constructor() {
@@ -172,6 +186,94 @@ class ReportRepository {
 
 
 
+    async fetchPositions(): Promise<Position[]> {
+        try {
+            const reports = await this.getReports();
+            return reports.filter(report => report.status === ReportStatus.VALIDATED).map(report => {
+                const geom = report.position as any;
+                return {
+                    lat: geom.coordinates[1],
+                    lng: geom.coordinates[0]
+                };
+            });
+        } catch (error) {
+            console.error(error);
+            throw new Error("Errore durante il recupero delle posizioni");
+        }
+    }
+    async searchReportsWithinRange(lat: number, lng: number, range: number, startDate?: Date, endDate?: Date): Promise<Report[]> {
+        try {
+            const reports = await this.getReports(); // Assumi che questa funzione recuperi tutti i report
+            const filteredReports = reports.filter(report => {
+                // Filtra i report con status 'VALIDATED'
+                if (report.status !== ReportStatus.VALIDATED) {
+                    return false;
+                }
+                
+                // Calcola la distanza tra il punto del report e il punto di ricerca
+                const reportLat = report.position.coordinates[1];
+                const reportLng = report.position.coordinates[0];
+                const distance = getDistance(
+                    { latitude: lat, longitude: lng },
+                    { latitude: reportLat, longitude: reportLng }
+                );
+                
+                // Filtra per distanza (geolib restituisce la distanza in metri, quindi converti il range da km a metri)
+                const isWithinRange = distance <= range * 1000;
+                
+                // Filtra per data se fornita
+                const reportDate = new Date(report.date);
+                const isWithinDateRange = (!startDate || reportDate >= startDate) && (!endDate || reportDate <= endDate);
+                
+                return isWithinRange && isWithinDateRange;
+            });
+    
+            return filteredReports;
+        } catch (err) {
+            console.error(err);
+            throw new Error("Errore durante la ricerca dei report nel raggio");
+        }
+    }
+
+
+    async runDbscan({ data, eps, minPts }: IClusterData): Promise<IClusterResult> {
+        try {
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error("Nessun dato disponibile per DBSCAN");
+            }
+            
+            console.log("Dati per DBSCAN:", data); 
+            const formattedData = data.map(pos => [pos.lat, pos.lng]);
+            console.log("Dati formattati per DBSCAN:", formattedData); // Log dei dati formattati
+
+            // Verifica se i dati sono corretti
+            if (formattedData.length === 0) {
+                throw new Error("Nessun dato formattato disponibile per DBSCAN");
+            }
+            
+            const clusterIds = this.dbscan.run(formattedData, eps, minPts);
+
+            const clusters: { [key: number]: [number, number][] } = {};
+            const noise: [number, number][] = [];
+
+            formattedData.forEach((coord, index) => {
+                const clusterId = clusterIds[index];
+                if (clusterId === -1) {
+                    noise.push(coord);
+                } else {
+                    if (!clusters[clusterId]) {
+                        clusters[clusterId] = [];
+                    }
+                    clusters[clusterId].push(coord);
+                }
+            });
+            return { clusters, noise: [] };
+        } catch (error) {
+            console.error(error);
+            throw new Error("Esecuzione DBSCAN fallita");
+        }
+    }
+    
 
     async createRandomData(): Promise<void> {
 
@@ -226,45 +328,6 @@ class ReportRepository {
         data.forEach(async (e) => await this.createReport(e))
         
     }
-    async fetchPositions(): Promise<Position[]> {
-        try {
-            const reports = await this.getReports();
-            return reports.map(report => {
-                const geom = report.position as any;
-                return {
-                    lat: geom.coordinates[1],
-                    lng: geom.coordinates[0]
-                };
-            });
-        } catch (error) {
-            console.error(error);
-            throw new Error("Errore durante il recupero delle posizioni");
-        }
-    }
-    async runDbscan({ data, eps, minPts }: IClusterData): Promise<IClusterResult> {
-        try {
-            if (!Array.isArray(data) || data.length === 0) {
-                throw new Error("Nessun dato disponibile per DBSCAN");
-            }
-            
-            console.log("Dati per DBSCAN:", data); 
-            const formattedData = data.map(pos => [pos.lat, pos.lng]);
-            console.log("Dati formattati per DBSCAN:", formattedData); // Log dei dati formattati
-
-            // Verifica se i dati sono corretti
-            if (formattedData.length === 0) {
-                throw new Error("Nessun dato formattato disponibile per DBSCAN");
-            }
-            
-            const clusters = this.dbscan.run(formattedData, eps, minPts);
-
-            return { clusters, noise: [] };
-        } catch (error) {
-            console.error(error);
-            throw new Error("Esecuzione DBSCAN fallita");
-        }
-    }
-    
 }
 
 export { ReportRepository };

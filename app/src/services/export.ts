@@ -123,67 +123,71 @@ class StatisticExportService extends ExportServiceBase {
 
 class ClusteringExportService extends ExportServiceBase {
     async generateCsv(): Promise<Buffer> {
-        if (this.data.clusters.length === 0 && this.data.noise.length === 0) {
+        if (Object.keys(this.data.clusters).length === 0 && this.data.noise.length === 0) {
             throw new Error('No data available for CSV export');
         }
-    
-        // Trasformare i dati in un array di oggetti
-        const clusterData = this.data.clusters.map((cluster, index) => ({
-            type: 'Cluster',
-            id: index,
-            items: cluster.join(', ')
-        }));
-    
+        console.log(`\n\n\n  Object.entries(this.data.clusters) \n${ Object.entries(this.data.clusters)}\n\n\n`)
+        console.log(`\n\n\n  this.data.clusters \n${JSON.stringify(this.data.clusters)}\n\n\n`)
+        // Transform the data into an array of objects
+        const clusterData = Object.entries(this.data.clusters).filter(([key, coordinates]) => key!=="undefined").flatMap(([key, coordinates], index) => 
+            coordinates.map(coord => ({
+                id: `Cluster ${index}`,
+                items: key,
+                centroid: coord
+            }))
+        );
+        console.log(`\n\n\n  this.data.noise \n${JSON.stringify(this.data.noise)}\n\n\n`)
         const noiseData = this.data.noise.map((item, index) => ({
-            type: 'Noise',
-            id: index,
-            item
+            id: `Noise ${index.toString()}`,
+            items: item
         }));
-    
+
         const formattedData = [...clusterData, ...noiseData];
-    
+
         const csvStringifier = createObjectCsvStringifier({
             header: [
-                { id: 'type', title: 'TYPE' },
                 { id: 'id', title: 'ID' },
-                { id: 'items', title: 'ITEMS' }
+                { id: 'items', title: 'ITEMS' },
+                { id: 'centroid', title: 'CENTROID' }
             ]
         });
-    
+
         const csv = csvStringifier.getHeaderString() + csvStringifier.stringifyRecords(formattedData);
         return Buffer.from(csv, 'utf-8');
-    }   
+    }
+
     async generatePdf(): Promise<Buffer> {
         const browser = await puppeteer.launch({
             args: ['--no-sandbox', '--disable-setuid-sandbox']
         });
         try {
             const page = await browser.newPage();
-    
-            // Trasformare i dati in una forma tabellare
-            const clusterData = this.data.clusters.map((cluster, index) => ({
-                type: 'Cluster',
-                id: index,
-                items: cluster.join(', ')
-            }));
-    
+
+            // Transform the data into a tabular form
+            const clusterData = Object.entries(this.data.clusters).filter(([key, coordinates])=> key !== 'undefined').flatMap(([key, coordinates], index) =>
+                coordinates.map(coord => ({
+                    id: `Cluster ${index}`,
+                    items: key,
+                    centroid: coord
+                }))
+            );
+
             const noiseData = this.data.noise.map((item, index) => ({
-                type: 'Noise',
-                id: index,
+                id: `Noise ${index.toString()}`,
                 items: item
             }));
-    
+
             const formattedData = [...clusterData, ...noiseData];
-    
-            // Creare righe HTML per i dati
-            let htmlRows = formattedData.map(record => `
+
+            // Create HTML rows for the data
+            const htmlRows = formattedData.map(record => `
                 <tr>
-                    <td>${record.type}</td>
                     <td>${record.id}</td>
                     <td>${record.items}</td>
+                    <td>${record.centroid}</td>
                 </tr>
             `).join('');
-    
+
             const html = `
                 <html>
                 <head>
@@ -197,9 +201,9 @@ class ClusteringExportService extends ExportServiceBase {
                     <table>
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th>ID</th>
+                                <th>Record Id</th>
                                 <th>Items</th>
+                                <th>Centroid</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -209,7 +213,7 @@ class ClusteringExportService extends ExportServiceBase {
                 </body>
                 </html>
             `;
-    
+
             await page.setContent(html);
             const pdfBuffer = await page.pdf({ format: 'A4' });
             return pdfBuffer;
@@ -217,8 +221,8 @@ class ClusteringExportService extends ExportServiceBase {
             await browser.close();
         }
     }
-
 }
+
 
 class ValidatedExportService extends ExportServiceBase {
     async generateCsv(): Promise<Buffer> {

@@ -476,6 +476,30 @@ class ReportService {
 
         return statusCounts;
     }
+    async getReportsWithinRange(req: Request, res: Responsen, next: NextFunction): Promise<void> {
+        try {
+            const { lat, lng, range, startDate, endDate } = req.query;
+
+            if (!lat || !lng || !range) {
+                return res.build('BadRequest','I parametri lat, lng e range sono obbligatori.');
+            }
+
+            const latNumber = parseFloat(lat as string);
+            const lngNumber = parseFloat(lng as string);
+            const rangeNumber = parseFloat(range as string);
+            const start = startDate ? new Date(startDate as string) : undefined;
+            const end = endDate ? new Date(endDate as string) : undefined;
+
+            if (isNaN(latNumber) || isNaN(lngNumber) || isNaN(rangeNumber) || (startDate && isNaN(start.getTime())) || (endDate && isNaN(end.getTime()))) {
+                return res.build('BadRequest','I parametri lat, lng, range devono essere numeri validi e startDate, endDate devono essere date valide.');
+            }
+
+            const reports = await reportRepository.searchReportsWithinRange(latNumber, lngNumber, rangeNumber, start, end);
+            res.status(200).json({ success: true, message: 'Found Reports', reports });
+        } catch (error) {
+            next(ISError("Errore durante la ricerca dei report",error));
+        }
+    }
 
 }
 

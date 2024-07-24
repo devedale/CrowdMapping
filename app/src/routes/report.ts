@@ -13,6 +13,7 @@ export default (app: Express) =>{
     app.get(`${base_url}/statistics/:format`, reportService.reportStatistics);
     app.get(`${base_url}/dbscan/:eps/:minPts`, reportService.runDbscan);
     app.get(`${base_url}/dbscan/:eps/:minPts/:format`, reportService.runDbscan);
+    app.get(`${base_url}/find`, reportService.getReportsWithinRange);
     app.get(`${base_url}/:id`, authMiddleware, reportService.getReportById);
     app.post(`${base_url}`, authMiddleware, reportService.createReport);
     app.patch(`${base_url}/:id`, authMiddleware, reportService.updateReport);

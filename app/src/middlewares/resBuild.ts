@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { ISError } from '../errors/ErrorFactory';
+import { HttpStatusCode } from '../errors/HttpStatusCode';
+import { ErrorFactory } from '../errors/ErrorFactory';
 
 export default (req: Request, res: Response, next: NextFunction) => {
     res.build = (errorType: string, message: string) => {
