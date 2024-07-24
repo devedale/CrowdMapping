@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { ReportRepository, ICreateReport } from "../database/repository/report";
 import { RoleRepository } from "../database/repository/role";
 import { ReportType, Severity, ReportStatus } from "../database/models/report";
-import { ExportService } from "./export";
+import ExportService from "./export";
 import { ISError } from '../errors/ErrorFactory';
 
 const reportRepository = new ReportRepository();
@@ -20,7 +20,7 @@ interface StatusCounts {
 
 class ReportService {
     constructor(){
-        this.exportReportStatistics = this.exportReportStatistics.bind(this);
+        this.reportStatistics = this.reportStatistics.bind(this);
     }
 
     async createReport(req: Request, res: Response, next: NextFunction) {
@@ -363,7 +363,7 @@ class ReportService {
 
     }
 
-    async exportReportStatistics(req: Request, res: Response, next: NextFunction) {
+    async reportStatistics(req: Request, res: Response, next: NextFunction) {
         try {
             const format = req.params.format;
 
@@ -375,7 +375,7 @@ class ReportService {
 
             if (format !== undefined) {
                 const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
-                const exportService = new ExportService(statusCounts);
+                const exportService = new ExportService(statusCounts).statisticsExportService;
 
                 if (typeof exportService[methodName] === 'function') {
                     const fileBuffer = await exportService[methodName]();
@@ -393,6 +393,51 @@ class ReportService {
         } catch (err) {
             console.log(err);
             next(ISError('errore durante il recupero delle statistiche', err));
+        }
+    }
+
+    async runDbscan(req: Request, res: Response, next: NextFunction) {
+        const eps = parseFloat(req.params.eps);
+        const minPts = parseInt(req.params.minPts);
+        if (typeof eps !== 'number' || typeof minPts !== 'number' ||
+            !Number.isFinite(eps) || !Number.isInteger(minPts) ||
+            eps <= 0 || minPts < 1) {            
+                return res.status(400).send('Dati di input non validi');
+        }
+
+        const format = req.params.format;
+        if (!['json', 'csv', 'pdf', undefined].includes(format)) {
+            return res.build("BadRequest", 'Formato non valido');
+        }
+
+
+    
+        try {
+            const positions = await reportRepository.fetchPositions()
+            const result = await reportRepository.runDbscan({ data: positions, eps, minPts });
+
+            if (format !== undefined) {
+                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
+                const exportService = new ExportService(result).clusteringExportService;
+
+                if (typeof exportService[methodName] === 'function') {
+                    const fileBuffer = await exportService[methodName]();
+                    return res.sendFile(fileBuffer, format);
+                } else {
+                    return res.build("BadRequest", 'Formato non valido');
+                }
+            }
+
+            if (format === undefined) {
+                return res.status(200).json({ success: true, message: 'Report statistics', result });
+            }
+
+            next();
+    
+        } catch (err) {
+
+            next(ISError('Errore durante il DBSCAN.',err));
+
         }
     }
 
@@ -431,7 +476,6 @@ class ReportService {
 
         return statusCounts;
     }
-
 
 }
 

@@ -1,5 +1,7 @@
 import { RoleRepository } from "./repository/role";
 import { UserRepository } from "./repository/user";
+import { ReportRepository } from "./repository/report";
+
 
 const MAX_RETRIES = 3; 
 const RETRY_DELAY = 2000; 
@@ -12,6 +14,7 @@ export default async () => {
         try {
             const roleRepository = new RoleRepository();
             const userRepository = new UserRepository();
+            const reportRepository = new ReportRepository();
 
             // Check if role with id 1 exists
             const role_1 = await roleRepository.getRoleById(1);
@@ -27,7 +30,7 @@ export default async () => {
                     email: process.env.ADMIN_EMAIL || "admin@email.com",
                     password: process.env.ADMIN_PASSWORD || "admin_password"
                 });
-
+                await reportRepository.createRandomData()
                 // If everything succeeds without errors, mark database as ready
                 dbReady = true;
             } else {

@@ -4,6 +4,7 @@ import { Dao } from './dao';
 import { User } from './user'; 
 
 
+
 export enum ReportStatus {
     PENDING = 'PENDING',
     REJECTED = 'REJECTED',
@@ -116,6 +117,7 @@ class Report extends Model {
     static associate() {
         this.belongsTo(User, { foreignKey: 'userId', as: 'user' });
     }
+
 }
 
 Report.initialize();
@@ -123,3 +125,10 @@ Report.associate();
 
 
 export { Report };
+
+
+
+
+
+
+

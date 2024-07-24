@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { HttpStatusCode } from '../errors/HttpStatusCode';
-import { ErrorFactory } from '../errors/ErrorFactory';
+import { ISError } from '../errors/ErrorFactory';
 
 export default (req: Request, res: Response, next: NextFunction) => {
     res.build = (errorType: string, message: string) => {
+        try{
         const error = ErrorFactory.getError(errorType);
         if (error) {
             error.setDetails(message);
@@ -13,6 +13,9 @@ export default (req: Request, res: Response, next: NextFunction) => {
                 message: 'Unknown error type',
                 details: message
             });
+        }
+        } catch (err) {
+        next(ISError('Error building response', err));
         }
     };
     next();
