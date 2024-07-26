@@ -39,7 +39,7 @@ class UserService {
             const coins = 0;
             const validated = 0;
             const newUser = await userRepository.createUser({ nickname, email, password, roleId, coins, validated });
-            res.status(201).json({ success: true, message: 'Registrazione completata', user: newUser });
+            res.build("Created",'Registrazione completata',newUser);
         } catch (error) {
             next(ISError('Errore durante la registrazione.',err));    
         } 
@@ -82,7 +82,7 @@ class UserService {
                 );
             }
 
-            res.status(200).json({ success: true, message: 'Accesso riuscito', token });
+            res.build("OK",'Accesso riuscito',token);
 
         } catch (err) {
 
@@ -100,7 +100,7 @@ class UserService {
       
             }
 
-            res.status(200).json({ success: true, message: 'Lista Utenti', users });
+            res.build("OK",'Lista Utenti',users);
 
         } catch (err) {
 
@@ -119,7 +119,7 @@ class UserService {
       
             }
 
-            res.status(200).json({ success: true, message: 'Rank List:', rankList });
+            res.build("OK",'Rank List',rankList);
 
         } catch (err) {
 

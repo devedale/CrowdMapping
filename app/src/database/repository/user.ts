@@ -29,7 +29,7 @@ class UserRepository {
 
     async createAdmin(data: ICreateUser): Promise<User> { // MANCA SERVICE REGISTER ADMIN
         try {
-            // Cerca il ruolo con nome "admin"
+            
             const role = await roleRepository.getRoleByName('admin');
 
             if (!role) {

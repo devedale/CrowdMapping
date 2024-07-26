@@ -10,9 +10,7 @@ export default (app: Express) =>{
     app.patch(`${base_url}/bulk_update`, authMiddleware, reportService.bulkUpdateReport);
     app.get(`${base_url}/my_reports`, authMiddleware, reportService.getMyReports);
     app.get(`${base_url}/statistics`, reportService.reportStatistics);
-    app.get(`${base_url}/statistics/:format`, reportService.reportStatistics);
-    app.get(`${base_url}/dbscan/:eps/:minPts`, reportService.runDbscan);
-    app.get(`${base_url}/dbscan/:eps/:minPts/:format`, reportService.runDbscan);
+    app.get(`${base_url}/dbscan`, reportService.runDbscan);
     app.get(`${base_url}/find`, reportService.getReportsWithinRange);
     app.get(`${base_url}/:id`, authMiddleware, reportService.getReportById);
     app.post(`${base_url}`, authMiddleware, reportService.createReport);

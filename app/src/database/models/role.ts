@@ -23,11 +23,11 @@ class Role extends Model {
                 },
                 createdAt: {
                     type: DataTypes.DATE,
-                    field: 'createdat' // specifica il nome della colonna nel database
+                    field: 'createdat' 
                 },
                 updatedAt: {
                     type: DataTypes.DATE,
-                    field: 'updatedat' // specifica il nome della colonna nel database
+                    field: 'updatedat' 
                 }
             },
             {
@@ -37,7 +37,7 @@ class Role extends Model {
             }
         );
 
-        this.dao = new Dao<Role>(this); // Istanzia la proprietà dao con new Dao<Role>(this)
+        this.dao = new Dao<Role>(this); 
     }
 
 }

@@ -1,4 +1,5 @@
 import express from 'express';
+import filterRequestMiddleware from './middlewares/filterRequest';
 import loggerMiddleware from './middlewares/logger';
 import resBuild from './middlewares/resBuild';
 import resSendFile from './middlewares/resSendFile';
@@ -20,9 +21,11 @@ app.use(loggerMiddleware);
 app.use(reqValidate);
 app.use(resBuild);
 app.use(resSendFile);
+app.use(filterRequestMiddleware);
 
 
 routesConfig(app);
+
 
 
 

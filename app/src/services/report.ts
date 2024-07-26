@@ -18,6 +18,14 @@ interface StatusCounts {
     };
 }
 
+function parseDate(dateStr: string): Date | null {
+    if (dateStr.length < 10 || isNaN(Date.parse(dateStr))) {
+        return null;
+    }
+    return new Date(Date.parse(dateStr));
+}
+
+
 class ReportService {
     constructor(){
         this.reportStatistics = this.reportStatistics.bind(this);
@@ -32,7 +40,7 @@ class ReportService {
                 date = new Date();
             }
 
-            if (date.length<10||isNaN(Date.parse(date))) {
+            if (date.length<10||isNaN(parseDate(date))) {
 
                 return res.build("BadRequest",`Invalid date value. Example of a valid value: "2023-07-21T15:00:00Z", "2023-07-21", "2023-21-07", "2023/07/21", "21-07-2023"`);
             
@@ -65,7 +73,7 @@ class ReportService {
             const status = ReportStatus.PENDING
             const newReport = await reportRepository.createReport({ userId, date, position, type, severity, status});
 
-            res.status(201).json({ success: true, message: 'Report Creato', report: newReport });
+            res.build("Created",'Report Creato',newReport);
 
         } catch (err) {
 
@@ -87,7 +95,7 @@ class ReportService {
 
             }
 
-            res.status(200).json({ success: true, message: 'Lista Report', reports });
+            res.build("OK",'Lista Report',reports);
 
         } catch (err) {
             console.log(err);
@@ -121,7 +129,7 @@ class ReportService {
             
             }
             
-            res.status(200).json({ success: true, message: 'Report', report });
+            res.build("OK",'Report',report);
 
         } catch (err) {
 
@@ -146,9 +154,7 @@ class ReportService {
                 return res.build('NotFound',`Report ${reportId} non trovato`);
 
             }
-            const userId = req['userId']
-            const userRole = roleRepository.getRoleById(userId)
-            const reportUserId = report.userId
+
 
             if (data.userId) {
 
@@ -160,8 +166,10 @@ class ReportService {
                 return res.build("Unauthorized", "Non è possibile aggiornare l'id...  ma sei matto?");
 
             }
+            const userId = req['userId']
             
-
+            const reportUserId = report.userId
+            const userRole = roleRepository.getRoleById(userId)
             if (userRole!== 'admin' && reportUserId!== userId) {
 
                 return res.build("Unauthorized", "Non hai i permessi per aggiornare questo report");
@@ -169,7 +177,7 @@ class ReportService {
             } else {
 
                 const updatedRecords = await reportRepository.updateReport(report,data)
-                res.status(200).json({ success: true, message: 'Report Aggiornati:', updatedRecords });
+                res.build("OK",'Report Aggiornati',updatedRecords);
 
             }
 
@@ -203,11 +211,19 @@ class ReportService {
                 return res.build("NotFound",'Report da aggiornare non presente');
             
             }
+            const userId = req['userId']
+            
+            const reportUserId = report.userId
+            const userRole = roleRepository.getRoleById(userId)
+            if (userRole!== 'admin' && reportUserId!== userId) {
 
+                return res.build("Unauthorized", "Non hai i permessi per aggiornare questo report");
+
+            }
             if (report.status === ReportStatus.PENDING) {
 
-                await reportRepository.validateReport(id)
-                return res.status(200).json({ success: true, message: `Report ${id} validated` });
+                const result = await reportRepository.validateReport(id)
+                return res.build("OK",`Report ${id} validated`,result);
                 
             } else {
 
@@ -240,10 +256,19 @@ class ReportService {
             if (report === null) {
                 return res.build("NotFound",'Report da aggiornare non presente');
             }
+            const userId = req['userId']
+            
+            const reportUserId = report.userId
+            const userRole = roleRepository.getRoleById(userId)
+            if (userRole!== 'admin' && reportUserId!== userId) {
+
+                return res.build("Unauthorized", "Non hai i permessi per aggiornare questo report");
+
+            }
             if (report.status === ReportStatus.PENDING) {
 
-                await reportRepository.rejectReport(id)
-                return res.status(200).json({ success: true, message: `Report ${id} rejected` });
+                const result = await reportRepository.rejectReport(id)
+                return res.build("OK",`Report ${id} rejected`,result);
                 
             } else {
 
@@ -255,14 +280,13 @@ class ReportService {
             next(ISError('Errore durante l\'aggiornamento del report.',err));
         }
     }
-    async getMyReports(req, res, next) {
-        const { status, dateRange } = req.body;
-        req.validate(["status","dateRange"]);
-        
+    async getMyReports(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { status, startDate, endDate } = req.query;
+    
         if (status && !ReportStatus[status]) {
             return res.build("BadRequest", 'Invalid status');
         }
-        
+    
         try {
             const userId = req['userId'];
             const reports = await reportRepository.getReports();
@@ -277,40 +301,26 @@ class ReportService {
                 userFilteredReports = userFilteredReports.filter(report => report.status == status);
             }
     
-            if (dateRange) {
-                const { startDate, endDate } = dateRange;
-                if (startDate && endDate) {
-                    if (startDate.length<10||isNaN(Date.parse(startDate))) {
-
-                        return res.build("BadRequest",
-                            `Invalid start date value. Example of a valid value: "2023-07-21T15:00:00Z", "2023-07-21", "2023-21-07", "2023/07/21", "21-07-2023"`);
-                    
-                    }
-                    if (endDate.length<10||isNaN(Date.parse(endDate))) {
-
-                        return res.build("BadRequest",
-                            `Invalid start date value. Example of a valid value: "2023-07-21T15:00:00Z", "2023-07-21", "2023-21-07", "2023/07/21", "21-07-2023"`);
-                    
-                    }
-
-
-                    const start = Date.parse(startDate);
-                    const end = Date.parse(endDate);
-                    userFilteredReports = userFilteredReports.filter(report => {
-                        const reportDate = new Date(report.date);
-                        return reportDate >= start && reportDate <= end;
-                    });
-                } else {
-                    return res.build('BadRequest','range date valid format: { startDate, endDate }');
+            if (startDate || endDate) {
+                const start = startDate ? parseDate(startDate as string) : undefined;
+                const end = endDate ? parseDate(endDate as string) : undefined;
+    
+                if ((startDate && !start) || (endDate && !end)) {
+                    return res.build("BadRequest",
+                        `Invalid date format. Example of a valid value: "2023-07-21T15:00:00Z", "2023-07-21", "2023-21-07", "2023/07/21", "21-07-2023"`);
                 }
+    
+                userFilteredReports = userFilteredReports.filter(report => {
+                    const reportDate = new Date(report.date);
+                    return (!start || reportDate >= start) && (!end || reportDate <= end);
+                });
             }
     
-            res.status(200).json({ success: true, message: 'Report list', reports: userFilteredReports });
+            res.build("OK",'Report list',userFilteredReports);
         } catch (err) {
             next(ISError('Error retrieving reports.', err));
         }
-    }
-    
+    }    
 
     async bulkUpdateReport(req: Request, res: Response, next: NextFunction) {
 
@@ -352,7 +362,7 @@ class ReportService {
 
             const results = await reportRepository.bulkUpdateReport(validated, rejected);
 
-            return res.status(200).json({ success: true, results});
+            return res.build("OK",'Completed BulkUpdate',results);
         
         } catch (err) {
             
@@ -362,85 +372,6 @@ class ReportService {
 
 
     }
-
-    async reportStatistics(req: Request, res: Response, next: NextFunction) {
-        try {
-            const format = req.params.format;
-
-            if (!['json', 'csv', 'pdf', undefined].includes(format)) {
-                return res.build("BadRequest", 'Formato non valido');
-            }
-
-            const statusCounts = await this.generateInitialStatusCounts();
-
-            if (format !== undefined) {
-                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
-                const exportService = new ExportService(statusCounts).statisticsExportService;
-
-                if (typeof exportService[methodName] === 'function') {
-                    const fileBuffer = await exportService[methodName]();
-                    return res.sendFile(fileBuffer, format);
-                } else {
-                    return res.build("BadRequest", 'Formato non valido');
-                }
-            }
-
-            if (format === undefined) {
-                return res.status(200).json({ success: true, message: 'Report statistics', statusCounts });
-            }
-
-            next();
-        } catch (err) {
-            console.log(err);
-            next(ISError('errore durante il recupero delle statistiche', err));
-        }
-    }
-
-    async runDbscan(req: Request, res: Response, next: NextFunction) {
-        const eps = parseFloat(req.params.eps);
-        const minPts = parseInt(req.params.minPts);
-        if (typeof eps !== 'number' || typeof minPts !== 'number' ||
-            !Number.isFinite(eps) || !Number.isInteger(minPts) ||
-            eps <= 0 || minPts < 1) {            
-                return res.status(400).send('Dati di input non validi');
-        }
-
-        const format = req.params.format;
-        if (!['json', 'csv', 'pdf', undefined].includes(format)) {
-            return res.build("BadRequest", 'Formato non valido');
-        }
-
-
-    
-        try {
-            const positions = await reportRepository.fetchPositions()
-            const result = await reportRepository.runDbscan({ data: positions, eps, minPts });
-
-            if (format !== undefined) {
-                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
-                const exportService = new ExportService(result).clusteringExportService;
-
-                if (typeof exportService[methodName] === 'function') {
-                    const fileBuffer = await exportService[methodName]();
-                    return res.sendFile(fileBuffer, format);
-                } else {
-                    return res.build("BadRequest", 'Formato non valido');
-                }
-            }
-
-            if (format === undefined) {
-                return res.status(200).json({ success: true, message: 'Report statistics', result });
-            }
-
-            next();
-    
-        } catch (err) {
-
-            next(ISError('Errore durante il DBSCAN.',err));
-
-        }
-    }
-
     async generateInitialStatusCounts():Promise<StatusCount> {
         const reports = await reportRepository.getReports();
 
@@ -476,30 +407,136 @@ class ReportService {
 
         return statusCounts;
     }
-    async getReportsWithinRange(req: Request, res: Responsen, next: NextFunction): Promise<void> {
-        try {
-            const { lat, lng, range, startDate, endDate } = req.query;
+    async reportStatistics(req: Request, res: Response, next: NextFunction) {
 
-            if (!lat || !lng || !range) {
-                return res.build('BadRequest','I parametri lat, lng e range sono obbligatori.');
+        try {
+            const format = req.query.format;
+
+            if (!['json', 'csv', 'pdf', undefined].includes(format)) {
+                return res.build("BadRequest", 'Formato non valido');
+            }
+            
+            const statusCounts = await this.generateInitialStatusCounts();
+
+            if (format !== undefined) {
+                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
+                const exportService = new ExportService(statusCounts).statisticsExportService;
+
+
+                if (typeof exportService[methodName] === 'function') {
+                    const fileBuffer = await exportService[methodName]();
+                    return res.sendFile(fileBuffer, format);
+                } else {
+                    return res.build("BadRequest", 'Formato non valido');
+                }
             }
 
+            if (format === undefined) {
+                return res.build("OK",'Report statistics',statusCounts);
+            }
+
+            next();
+        } catch (err) {
+            console.log(err);
+            next(ISError('errore durante il recupero delle statistiche', err));
+        }
+    }
+
+    async runDbscan(req: Request, res: Response, next: NextFunction) {
+        const eps = parseFloat(req.query.eps as string);
+        const minPts = parseInt(req.query.minPts as string, 10);
+        const format = req.query.format; // Assuming 'format' is needed later
+    
+        // Validate the input parameters
+        if (
+            isNaN(eps) || isNaN(minPts) || 
+            !Number.isFinite(eps) || 
+            !Number.isInteger(minPts) ||
+            eps <= 0 || 
+            minPts < 1
+        ) {
+            return res.build("BadRequest", 'Dati di input non validi');
+        }
+
+        if (!['json', 'csv', 'pdf', undefined].includes(format)) {
+            return res.build("BadRequest", 'Formato non valido');
+        }
+
+
+    
+        try {
+            const positions = await reportRepository.fetchPositions()
+            const result = await reportRepository.runDbscan({ data: positions, eps, minPts });
+
+            if (format !== undefined) {
+                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
+                const exportService = new ExportService(result).clusteringExportService;
+
+                if (typeof exportService[methodName] === 'function') {
+                    const fileBuffer = await exportService[methodName]();
+                    return res.sendFile(fileBuffer, format);
+                } else {
+                    return res.build("BadRequest", 'Formato non valido');
+                }
+            }
+
+            if (format === undefined) {
+                return res.build("OK",'Report statistics',result);
+            }
+
+            next();
+    
+        } catch (err) {
+
+            next(ISError('Errore durante il DBSCAN.',err));
+
+        }
+    }
+
+    async getReportsWithinRange(req: Request, res: Response, next: NextFunction): Promise<void> {
+        try {
+            const { lat, lng, range, startDate, endDate, format } = req.query;
+    
+            if (!lat || !lng || !range) {
+                return res.build('BadRequest', 'The parameters lat, lng, and range are required.');
+            }
+    
             const latNumber = parseFloat(lat as string);
             const lngNumber = parseFloat(lng as string);
             const rangeNumber = parseFloat(range as string);
-            const start = startDate ? new Date(startDate as string) : undefined;
-            const end = endDate ? new Date(endDate as string) : undefined;
-
-            if (isNaN(latNumber) || isNaN(lngNumber) || isNaN(rangeNumber) || (startDate && isNaN(start.getTime())) || (endDate && isNaN(end.getTime()))) {
-                return res.build('BadRequest','I parametri lat, lng, range devono essere numeri validi e startDate, endDate devono essere date valide.');
+            const start = startDate ? parseDate(startDate as string) : undefined;
+            const end = endDate ? parseDate(endDate as string) : undefined;
+    
+            if (isNaN(latNumber) || isNaN(lngNumber) || isNaN(rangeNumber) || (startDate && !start) || (endDate && !end)) {
+                return res.build('BadRequest', 'The parameters lat, lng, range must be valid numbers and startDate, endDate must be valid dates.');
             }
-
+    
+            if (format && !['json', 'csv', 'pdf'].includes(format)) {
+                return res.build('BadRequest', 'Formato non valido');
+            }
+    
             const reports = await reportRepository.searchReportsWithinRange(latNumber, lngNumber, rangeNumber, start, end);
-            res.status(200).json({ success: true, message: 'Found Reports', reports });
+    
+            if (format) {
+                const methodName = `generate${format.charAt(0).toUpperCase() + format.slice(1)}`;
+                const exportService = new ExportService(reports).validatedExportService;
+    
+                if (typeof exportService[methodName] === 'function') {
+                    const fileBuffer = await exportService[methodName]();
+                    return res.sendFile(fileBuffer, format);
+                } else {
+                    return res.build('BadRequest', 'Formato non valido');
+                }
+            }
+    
+            return res.build("OK",'Found Reports',reports);
+
         } catch (error) {
-            next(ISError("Errore durante la ricerca dei report",error));
+            next(ISError("Error during the report search", error));
         }
     }
+    
+        
 
 }
 

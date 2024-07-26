@@ -31,16 +31,16 @@ export default async () => {
                     password: process.env.ADMIN_PASSWORD || "admin_password"
                 });
                 await reportRepository.createRandomData()
-                // If everything succeeds without errors, mark database as ready
+
                 dbReady = true;
             } else {
-                // Database already initialized
+
                 dbReady = true;
             }
         } catch (err) {
             console.log(`Attempt ${retries + 1} failed:`, err);
             retries++;
-            // Wait before retrying
+
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
         }
     }

@@ -9,7 +9,7 @@ class Database {
       database: process.env.DB_DB || '',
       username: process.env.DB_USER || '',
       password: process.env.DB_PASSWORD || '',
-      host: 'db', // Assicurati che l'host sia corretto
+      host: 'db', 
       dialect: 'postgres',
       dialectOptions: {
         autoIncrement: true

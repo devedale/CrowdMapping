@@ -71,9 +71,11 @@ class ReportRepository {
             }
 
         } catch (error) {
-            console.error('\n\n\n\n\nerror\n\n\n\n\n');
-            console.error(error);
+            
+
             throw new Error("Recupero report per ID fallito");
+
+            
         }
     }
 
@@ -192,8 +194,8 @@ class ReportRepository {
             return reports.filter(report => report.status === ReportStatus.VALIDATED).map(report => {
                 const geom = report.position as any;
                 return {
-                    lat: geom.coordinates[1],
-                    lng: geom.coordinates[0]
+                    lat: geom.coordinates[0],
+                    lng: geom.coordinates[1]
                 };
             });
         } catch (error) {
@@ -203,25 +205,21 @@ class ReportRepository {
     }
     async searchReportsWithinRange(lat: number, lng: number, range: number, startDate?: Date, endDate?: Date): Promise<Report[]> {
         try {
-            const reports = await this.getReports(); // Assumi che questa funzione recuperi tutti i report
+            const reports = await this.getReports(); 
             const filteredReports = reports.filter(report => {
-                // Filtra i report con status 'VALIDATED'
+
                 if (report.status !== ReportStatus.VALIDATED) {
                     return false;
                 }
                 
-                // Calcola la distanza tra il punto del report e il punto di ricerca
-                const reportLat = report.position.coordinates[1];
-                const reportLng = report.position.coordinates[0];
-                const distance = getDistance(
-                    { latitude: lat, longitude: lng },
-                    { latitude: reportLat, longitude: reportLng }
-                );
+                const reportLat = report.position.coordinates[0];
+                const reportLng = report.position.coordinates[1];
+                const distance = haversineDistance(lat,lng,reportLat,reportLng)
+
+                console.log(`distance: ${distance}`)
                 
-                // Filtra per distanza (geolib restituisce la distanza in metri, quindi converti il range da km a metri)
-                const isWithinRange = distance <= range * 1000;
+                const isWithinRange = distance <= range;
                 
-                // Filtra per data se fornita
                 const reportDate = new Date(report.date);
                 const isWithinDateRange = (!startDate || reportDate >= startDate) && (!endDate || reportDate <= endDate);
                 
@@ -229,6 +227,8 @@ class ReportRepository {
             });
     
             return filteredReports;
+
+
         } catch (err) {
             console.error(err);
             throw new Error("Errore durante la ricerca dei report nel raggio");
@@ -244,9 +244,8 @@ class ReportRepository {
             
             console.log("Dati per DBSCAN:", data); 
             const formattedData = data.map(pos => [pos.lat, pos.lng]);
-            console.log("Dati formattati per DBSCAN:", formattedData); // Log dei dati formattati
+            console.log("Dati formattati per DBSCAN:", formattedData); 
 
-            // Verifica se i dati sono corretti
             if (formattedData.length === 0) {
                 throw new Error("Nessun dato formattato disponibile per DBSCAN");
             }
@@ -287,7 +286,6 @@ class ReportRepository {
             return `${month}-${day}-${year}`;
         }
         
-        // Funzione per generare coordinate casuali entro ±2 gradi
         function randomCoordinates(baseLat: number, baseLng: number): [number, number] {
             const lat = baseLat + (Math.random() - 0.5) * 4; // ±2 gradi
             const lng = baseLng + (Math.random() - 0.5) * 4; // ±2 gradi
