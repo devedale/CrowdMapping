@@ -99,7 +99,7 @@ Backend in **Node.js** con **Express** che interagisce con un database **Postgre
 ![Diagramma Casi d'uso](PotholeCrowmappingUseCaseDiagram.png)
 
 ### 🕸️ Diagramma delle Sequenze
-![Diagramma Sequenze](PotholeCrowmappingSequenceDiagram.png)
+![Diagramma Sequenze](PotholeCrowdmappingSequenceDiagram.png)
 
 ## 🎨 Pattern Usati
 
