@@ -8,14 +8,9 @@ import errorHandlerMiddleware from './middlewares/errorHandler';
 import routesConfig from './routesConfig';
 import dbConfig from './database/config';
 
- 
-
-
 export const app = express();
 
-
-app.use(express.json()); 
-
+app.use(express.json());
 
 app.use(loggerMiddleware);
 app.use(reqValidate);
@@ -23,12 +18,7 @@ app.use(resBuild);
 app.use(resSendFile);
 app.use(filterRequestMiddleware);
 
-
 routesConfig(app);
-
-
-
-
 
 app.use(errorHandlerMiddleware);
 

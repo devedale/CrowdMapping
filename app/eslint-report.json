@@ -1,0 +1,473 @@
+[
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/eslint.config.mjs",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/app.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/cache.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/config.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/connection.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/models/dao.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/models/report.ts",
+    "messages": [
+      {
+        "ruleId": "no-undef",
+        "severity": 2,
+        "message": "'Severity' is not defined.",
+        "line": 40,
+        "column": 22,
+        "nodeType": "Identifier",
+        "messageId": "undef",
+        "endLine": 40,
+        "endColumn": 30
+      },
+      {
+        "ruleId": "no-undef",
+        "severity": 2,
+        "message": "'Severity' is not defined.",
+        "line": 40,
+        "column": 41,
+        "nodeType": "Identifier",
+        "messageId": "undef",
+        "endLine": 40,
+        "endColumn": 49
+      }
+    ],
+    "suppressedMessages": [],
+    "errorCount": 2,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": "import { Model, DataTypes } from 'sequelize';\nimport sequelize from '../connection';\nimport { Dao } from './dao';\nimport { User } from './user';\n\nexport enum ReportStatus {\n  PENDING = 'PENDING',\n  REJECTED = 'REJECTED',\n  VALIDATED = 'VALIDATED',\n}\n\nexport enum ReportType {\n  POTHOLE = 'Pothole',\n  DIP = 'Dip',\n}\n\nexport enum Pothole {\n  LOW = 'LOW Depth Pothole',\n  MEDIUM = 'MEDIUM Depth Pothole',\n  HIGH = 'HIGH Depth Pothole',\n}\n\nexport enum Dip {\n  LOW = 'LOW Prominence Dip',\n  MEDIUM = 'MEDIUM Prominence Dip',\n  HIGH = 'HIGH Prominence Dip',\n}\n\nexport const Severity = {\n  Pothole,\n  Dip,\n};\n\nclass Report extends Model {\n  private id!: number;\n  private userId!: number;\n  private date!: Date;\n  private position!: { type: 'Point'; coordinates: number[] };\n  private type!: ReportType;\n  private severity!: Severity.Pothole | Severity.Dip;\n  private status!: ReportStatus;\n  public dao!: Dao<Report>;\n\n  static initialize(): void {\n    this.init(\n      {\n        id: {\n          type: DataTypes.INTEGER,\n          autoIncrement: true,\n          primaryKey: true,\n        },\n        userId: {\n          type: DataTypes.INTEGER,\n          field: 'userid',\n          references: {\n            model: 'user',\n            key: 'id',\n          },\n          allowNull: false,\n        },\n        date: {\n          type: DataTypes.DATE,\n          allowNull: false,\n          defaultValue: DataTypes.NOW,\n        },\n        position: {\n          type: DataTypes.GEOMETRY('POINT', 4326),\n          allowNull: false,\n        },\n        type: {\n          type: DataTypes.ENUM,\n          values: [ReportType.POTHOLE, ReportType.DIP],\n          allowNull: false,\n        },\n        severity: {\n          type: DataTypes.ENUM,\n          values: [Severity.Pothole.LOW, Severity.Pothole.MEDIUM, Severity.Pothole.HIGH, Severity.Dip.LOW, Severity.Dip.MEDIUM, Severity.Dip.HIGH],\n          allowNull: false,\n        },\n        status: {\n          type: DataTypes.ENUM,\n          values: [ReportStatus.PENDING, ReportStatus.VALIDATED, ReportStatus.REJECTED],\n          allowNull: false,\n        },\n        createdAt: {\n          type: DataTypes.DATE,\n          field: 'createdat',\n        },\n        updatedAt: {\n          type: DataTypes.DATE,\n          field: 'updatedat',\n        },\n        deletedAt: {\n          type: DataTypes.DATE,\n          field: 'deletedat',\n        },\n      },\n      {\n        sequelize,\n        modelName: 'report',\n        timestamps: true,\n        paranoid: true,\n        deletedAt: 'deletedAt',\n      }\n    );\n\n    this.dao = new Dao<Report>(this);\n  }\n  static associate() {\n    this.belongsTo(User, { foreignKey: 'userId', as: 'user' });\n  }\n}\n\nReport.initialize();\nReport.associate();\n\nexport { Report };\n",
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/models/role.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/models/user.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/repository/report.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/repository/role.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/database/repository/user.ts",
+    "messages": [
+      {
+        "ruleId": "@typescript-eslint/no-unused-vars",
+        "severity": 2,
+        "message": "'password' is assigned a value but never used.",
+        "line": 21,
+        "column": 15,
+        "nodeType": "Identifier",
+        "messageId": "unusedVar",
+        "endLine": 21,
+        "endColumn": 23
+      }
+    ],
+    "suppressedMessages": [],
+    "errorCount": 1,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": "import { User } from '../models/user';\nimport { RoleRepository } from './role';\n\ninterface ICreateUser {\n  nickname: string;\n  email: string;\n  password: string;\n}\n\ninterface UserRank {\n  nickname: string;\n  coins: number;\n}\n\nconst roleRepository = new RoleRepository();\n\nclass UserRepository {\n  async createUser(data: ICreateUser): Promise<Partial<User>> {\n    try {\n      const user = await User.dao.create(data);\n      const { password, ...otherKeys } = user.dataValues;\n      return otherKeys as Partial<User>;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Creazione user fallita');\n    }\n  }\n\n  async createAdmin(data: ICreateUser): Promise<User> {\n    // MANCA SERVICE REGISTER ADMIN\n    try {\n      const role = await roleRepository.getRoleByName('admin');\n\n      if (!role) {\n        throw new Error('Ruolo \"admin\" non trovato');\n      }\n\n      data.roleId = role.id;\n\n      const user = await User.dao.create(data);\n      console.log('Admin creato');\n      console.log(user);\n      return user as User;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Creazione admin fallita');\n    }\n  }\n  async getUserById(id: number): Promise<User | null> {\n    try {\n      if (await this.userIdExist(id)) {\n        const user = await User.dao.get(id);\n        return user as User | null;\n      }\n    } catch (error) {\n      console.error(error);\n      throw new Error('Recupero utente per ID fallito');\n    }\n  }\n  async userIdExist(userId: number): Promise<boolean> {\n    // MANCA GESTIONE CACHE\n    const count = await User.count({ where: { id: userId } });\n    return count > 0;\n  }\n\n  async getUserByEmail(email: string): Promise<User | null> {\n    // MANCA GESTIONE CACHE\n    try {\n      const user = await User.findOne({ where: { email } });\n      return user as User | null;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Recupero utente per email fallito');\n    }\n  }\n  async getUsers(): Promise<User[] | null> {\n    try {\n      const users = await User.dao.getAll();\n      return users as User[] | null;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Recupero utenti fallito');\n    }\n  }\n  async updateUser(user: User, data: Partial<ICreateUser>): Promise<0 | 1> {\n    try {\n      console.log('Aggiornamento utente:', user);\n      return (await User.dao.update(user, data)) as 0 | 1;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Aggiornamento utente fallito');\n    }\n  }\n  async deleteUser(user: User): Promise<0 | 1> {\n    try {\n      console.log('Eliminazione utente:', user);\n      return (await User.dao.delete(user)) as 0 | 1;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Eliminazione utente fallita');\n    }\n  }\n  async userValidatePoint(userId: number): Promise<0 | 1> {\n    try {\n      const user = await this.getUserById(userId);\n      const validated = user.validated + 1;\n      console.log('Consegna punti validazione utente:', user);\n      return (await this.updateUser(user, { validated })) as 0 | 1;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Consegna punti validazione utente fallita');\n    }\n  }\n  async userTokenPoints(userId: number): Promise<0 | 1> {\n    try {\n      const user = await this.getUserById(userId);\n      let reward;\n      !(user.validated > 10) ? (reward = 0.1) : (reward = 0.15);\n      const coins = parseFloat(user.coins) + parseFloat(reward);\n      console.log('Ricompensa TokenPoints utente:', coins);\n      return (await this.updateUser(user, { coins })) as 0 | 1;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Consegna TokenPoints utente fallita');\n    }\n  }\n  async userReward(userId: number): Promise<0 | 1> {\n    try {\n      await this.userValidatePoint(userId);\n      await this.userTokenPoints(userId);\n    } catch (error) {\n      console.error(error);\n      throw new Error('Ricompensa utente fallita');\n    }\n  }\n  async usersRankList(sortOrder: 'asc' | 'desc' = 'desc'): Promise<UserRank[] | null> {\n    try {\n      const users = await this.getUsers();\n\n      const mappedUsers = users.map((user) => ({\n        nickname: user.nickname,\n        coins: user.coins,\n      }));\n\n      mappedUsers.sort((a, b) => {\n        if (sortOrder === 'asc') {\n          return a.coins - b.coins;\n        } else {\n          return b.coins - a.coins;\n        }\n      });\n\n      return mappedUsers;\n    } catch (error) {\n      console.error(error);\n      throw new Error('Recupero graduatoria fallito');\n    }\n  }\n}\n\nexport { UserRepository };\n",
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/errors/AppError.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/errors/ErrorFactory.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/errors/HttpStatusCode.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/index.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/_auth.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/_authRSA.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/errorHandler.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/filterRequest.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/jwtAuth.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/logger.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/reqValidate.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/resBuild.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/middlewares/resSendFile.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/routes/report.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/routes/user.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/routesConfig.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/services/export.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/services/report.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  },
+  {
+    "filePath": "/home/edoardo/PotholeCrowdMapping/app/src/services/user.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": [
+      { "ruleId": "no-extra-semi", "replacedBy": [] },
+      { "ruleId": "no-mixed-spaces-and-tabs", "replacedBy": [] }
+    ]
+  }
+]

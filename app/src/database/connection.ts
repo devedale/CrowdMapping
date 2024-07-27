@@ -9,25 +9,21 @@ class Database {
       database: process.env.DB_DB || '',
       username: process.env.DB_USER || '',
       password: process.env.DB_PASSWORD || '',
-      host: 'db', 
+      host: 'db',
       dialect: 'postgres',
       dialectOptions: {
-        autoIncrement: true
-      }
+        autoIncrement: true,
+      },
     });
   }
 
   public static getInstance(): Database {
     if (!Database.instance) {
-      Database.instance = new Database();
+      Database.instance = new Database()._sequelize;
     }
     return Database.instance;
-  }
-
-  get sequelize(): Sequelize {
-    return this._sequelize;
   }
 }
 
 const databaseInstance = Database.getInstance();
-export default databaseInstance.sequelize;
+export default databaseInstance;

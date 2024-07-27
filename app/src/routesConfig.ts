@@ -1,12 +1,10 @@
-import user from "./routes/user";
-import report from "./routes/report";
-import { app } from './app';
-
+import user from './routes/user';
+import report from './routes/report';
+import { Express } from 'express';
 
 export const routesConfig = async (app: Express) => {
-    //API
-    user(app);
-    report(app);
-}
+  user(app);
+  report(app);
+};
 
 export default routesConfig;

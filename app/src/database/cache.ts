@@ -1,38 +1,63 @@
 import Redis from 'ioredis';
 
-const redisURL = process.env.REDIS_URL || 'localhost'; 
-const redisPort = process.env.REDIS_PORT || parseInt('6379');  
+class RedisClient {
+  private static instance: RedisClient;
+  private client: Redis;
 
-const client = new Redis({
-  host: redisURL,
-  port: redisPort
-});
+  private constructor() {
+    const redisURL = process.env.REDIS_URL || 'localhost';
+    const redisPort = parseInt(process.env.REDIS_PORT || '6379', 10);
 
-client.on('error', (err) => {
-    console.error('Redis error:', err);
-});
+    this.client = new Redis({
+      host: redisURL,
+      port: redisPort,
+    });
 
-export const setInCache = (key: string, value: string): void => {
-    client.set(key, value);    
-};
+    this.client.on('error', (err) => {
+      console.error('Redis error:', err);
+    });
 
-export const getFromCache = (key: string): Promise<string | null> => {
-    return client.get(key);
-};
+    this.setInCache = this.setInCache.bind(this);
+    this.getFromCache = this.getFromCache.bind(this);
+    this.deleteFromCache = this.deleteFromCache.bind(this);
 
-export const deleteFromCache = (key: string): void => {
-    client.del(key);
-};
+    this.configureEvictionPolicy();
+  }
 
-// Configurarazione lru e limite di memoria
-const configureEvictionPolicy = async () => {
-    try {
-        await client.config('SET', 'maxmemory', '512mb');
-        await client.config('SET', 'maxmemory-policy', 'allkeys-lru');
-        console.log('Redis eviction policy configured to allkeys-lru with maxmemory 512mb');
-    } catch (err) {
-        console.error('Failed to configure Redis eviction policy:', err);
+  public static getInstance(): RedisClient {
+    if (!RedisClient.instance) {
+      RedisClient.instance = new RedisClient();
     }
-};
+    return RedisClient.instance;
+  }
 
-configureEvictionPolicy();
+  public setInCache(key: string, value: string): void {
+    this.client.set(key, value);
+  }
+
+  public async getFromCache(key: string): Promise<string | null> {
+    try {
+      return await this.client.get(key);
+    } catch (error) {
+      console.error('Error getting value from cache:', error);
+      return null; // Return null or handle it as appropriate
+    }
+  }
+
+  public deleteFromCache(key: string): void {
+    this.client.del(key);
+  }
+
+  private async configureEvictionPolicy(): Promise<void> {
+    try {
+      await this.client.config('SET', 'maxmemory', '512mb');
+      await this.client.config('SET', 'maxmemory-policy', 'allkeys-lru');
+      console.log('Redis eviction policy configured to allkeys-lru with maxmemory 512mb');
+    } catch (err) {
+      console.error('Failed to configure Redis eviction policy:', err);
+    }
+  }
+}
+
+const redisClient = RedisClient.getInstance();
+export default redisClient;
