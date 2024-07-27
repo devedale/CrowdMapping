@@ -1,1339 +1,1639 @@
 {
-  "info": {
-    "_postman_id": "3e683a02-4f8b-41e6-860e-f6fea98e2c51",
-    "name": "PA2024_v1",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "15883634"
-  },
-  "item": [
-    {
-      "name": "register",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Status code is 201\", function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Response has success message\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.eql(true);\r",
-              "    pm.expect(jsonData.message).to.eql(\"Registrazione completata\");\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Response contains user details\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.have.all.keys(\"id\", \"nickname\", \"email\", \"roleId\", \"coins\", \"validated\", \"createdAt\", \"updatedAt\");\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"nickname\": \"test\",\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdlkj123\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/register",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["users", "register"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "login",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Login utente - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Login utente - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdlkj123\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/login?email=edos@gmail.com&password=asdlkj123",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["users", "login"],
-          "query": [
-            {
-              "key": "email",
-              "value": "edos@gmail.com"
-            },
-            {
-              "key": "password",
-              "value": "asdlkj123"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "createReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Creazione report - Stato 201\", function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results.position.coordinates).to.eql([42.4642,13.19]);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              "\r",
-              "\r",
-              "\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"LOW Depth Pothole\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "users",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere utenti - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere utenti - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["users"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "report",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});"
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/1",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "1"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "reports",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere tutti i report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere tutti i report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere tutti i report - Contiene almeno un report\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "updateReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Aggiornare report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Aggiornare report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"MEDIUM Depth Pothole\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/51",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "51"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "validateReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Validare report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Validare report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Validare report - Messaggio di successo presente\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.include('validated');\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/51/validate",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "51", "validate"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "createReportToBeRejected",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Creazione report - Stato 201\", function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Creazione report - Secondo report creato in posizione [42.4642,13.19] ma questo verra messo in stato REJECTED quindi non lo troveremo nel test del find\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results.position.coordinates).to.eql([42.4642,13.19]);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"HIGH Depth Pothole\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "rejectReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Rifiutare report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Rifiutare report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Rifiutare report - Messaggio di successo presente\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.include('rejected');\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/52/reject",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "52", "reject"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "bulkUpdateReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Aggiornamento di report in bulk - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Aggiornamento di report in bulk - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Aggiornamento di report in bulk - Messaggio di completamento presente\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.include('Completed BulkUpdate');\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"validate_ids\": [1, 5, 7, 8, 10, 11, 13, 15, 16, 20, 22, 24, 27, 28, 30, 51, 52],\r\n    \"reject_ids\": [2, 3, 4, 6, 9, 12, 14, 17, 18, 19, 21, 23, 25, 26, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]\r\n}\r\n",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/bulk_update",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "bulk_update"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "myReports",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere i miei report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere i miei report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere i miei report - Contiene la lista di report\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/my_reports?startDate=12-12-2022&endDate=12-12-2040",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "my_reports"],
-          "query": [
-            {
-              "key": "startDate",
-              "value": "12-12-2022"
-            },
-            {
-              "key": "endDate",
-              "value": "12-12-2040"
-            },
-            {
-              "key": "status",
-              "value": "",
-              "disabled": true
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "usersRanklist",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere lista di ranking - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere lista di ranking - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere lista di ranking - Contiene la lista degli utenti\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/ranklist",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["users", "ranklist"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "reportsStatistics",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere statistiche - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere statistiche - Contenuto è un file PDF\", function () {\r",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/pdf\");\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere statistiche - Lunghezza del corpo della risposta è maggiore di 0\", function () {\r",
-              "    pm.expect(pm.response.text()).to.have.length.greaterThan(0);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/statistics?format=pdf",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "statistics"],
-          "query": [
-            {
-              "key": "format",
-              "value": "pdf"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "reportsDbscan",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Eseguire DBSCAN - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere statistiche - Contenuto è un file CSV\", function () {\r",
-              "    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"text/csv\");\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere statistiche - Lunghezza del corpo della risposta è maggiore di 0\", function () {\r",
-              "    pm.expect(pm.response.text()).to.have.length.greaterThan(0);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/dbscan?eps=0.4&minPts=3&format=csv",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "dbscan"],
-          "query": [
-            {
-              "key": "eps",
-              "value": "0.4"
-            },
-            {
-              "key": "minPts",
-              "value": "3"
-            },
-            {
-              "key": "format",
-              "value": "csv"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "reportsFind",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere report entro intervallo - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere report entro intervallo - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere report entro intervallo di 1000 metri - Contiene report\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Numero di report ottenuti uguale a 1 (il primo punto creato in createReport (salvo generazione casuale nelle vicinanze da reportRepository.createRandomData() in /src/database/config))\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results.length).to.eql(1);\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/find?lat=42.4642&lng=13.1900&range=800&startDate=12-12-2020",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "find"],
-          "query": [
-            {
-              "key": "lat",
-              "value": "42.4642"
-            },
-            {
-              "key": "lng",
-              "value": "13.1900"
-            },
-            {
-              "key": "range",
-              "value": "800"
-            },
-            {
-              "key": "startDate",
-              "value": "12-12-2020"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "createReport2",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Creazione report - Stato 201\", function () {\r",
-              "    pm.response.to.have.status(201);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Creare Report - Contiene report\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('object').that.is.not.empty;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4666, 13.1966]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"MEDIUM Depth Pothole\"\r\n}",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "validateReport2",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Validare report - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Validare report - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Validare report - Messaggio di successo presente\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.include('validated');\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/53/validate",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "53", "validate"]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "reportsFind2",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Ottenere report entro intervallo - Stato 200\", function () {\r",
-              "    pm.response.to.have.status(200);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere report entro intervallo - Risposta ha successo true\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.true;\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Ottenere report entro intervallo di 1000 metri - Contiene report\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
-              "});\r",
-              "pm.test(\"Numero di report ottenuti uguale a 2 (il primo punto creato in createReport piu il secondo creato in createReport2 (salvo generazione casuale nelle vicinanze in /src/database/config))\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.results.length).to.eql(2);\r",
-              "});\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "protocolProfileBehavior": {
-        "disableBodyPruning": true
-      },
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "",
-          "options": {
-            "raw": {
-              "language": "json"
-            }
-          }
-        },
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/find?lat=42.4642&lng=13.1900&range=800&startDate=12-12-2020",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "find"],
-          "query": [
-            {
-              "key": "lat",
-              "value": "42.4642"
-            },
-            {
-              "key": "lng",
-              "value": "13.1900"
-            },
-            {
-              "key": "range",
-              "value": "800"
-            },
-            {
-              "key": "startDate",
-              "value": "12-12-2020"
-            }
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "validateReportOtherUserReport",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"Validare report - Stato 401\", function () {\r",
-              "    pm.response.to.have.status(401);\r",
-              "});\r",
-              "\r",
-              "pm.test(\"Validare report - Risposta ha successo false\", function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.success).to.be.false;\r",
-              "});\r",
-              "\r",
-              "pm.test(`Validare report - Risposta ha messaggio: 'Unauthorized.'`, function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.message).to.eql('Unauthorized.')\r",
-              "});\r",
-              "\r",
-              "\r",
-              "pm.test(`Validare report - Risposta ha dettagli: 'Non hai i permessi per aggiornare questo report'`, function () {\r",
-              "    const jsonData = pm.response.json();\r",
-              "    pm.expect(jsonData.details).to.eql('Non hai i permessi per aggiornare questo report')\r",
-              "});\r",
-              "\r",
-              "pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
-              "    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
-              "});\r",
-              ""
-            ],
-            "type": "text/javascript",
-            "packages": {}
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "bearer",
-          "bearer": [
-            {
-              "key": "token",
-              "value": "{{TOKEN}}",
-              "type": "string"
-            }
-          ]
-        },
-        "method": "PATCH",
-        "header": [
-          {
-            "key": "filter-header",
-            "value": "{{FILTER HEADER VALUE}}",
-            "type": "text"
-          }
-        ],
-        "url": {
-          "raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/50/validate",
-          "host": ["127", "0", "0", "1"],
-          "port": "{{API_PORT}}{{API_VERSION}}",
-          "path": ["reports", "50", "validate"]
-        }
-      },
-      "response": []
-    }
-  ],
-  "variable": [
-    {
-      "key": "variable_key",
-      "value": ""
-    }
-  ]
+	"info": {
+		"_postman_id": "3e683a02-4f8b-41e6-860e-f6fea98e2c51",
+		"name": "PA2024_v1",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15883634"
+	},
+	"item": [
+		{
+			"name": "register",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response has success message\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.eql(true);\r",
+							"    pm.expect(jsonData.message).to.eql(\"Registrazione completata\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response contains user details\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.have.all.keys(\"id\", \"nickname\", \"email\", \"roleId\", \"coins\", \"validated\", \"createdAt\", \"updatedAt\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"nickname\": \"test\",\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdlkj123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/register",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"users",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Login utente - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Login utente - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"email\": \"test@test.com\",\r\n    \"password\": \"asdlkj123\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/login?email=edos@gmail.com&password=asdlkj123",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"users",
+						"login"
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "edos@gmail.com"
+						},
+						{
+							"key": "password",
+							"value": "asdlkj123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creazione report - Stato 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.position.coordinates).to.eql([42.4642,13.19]);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"LOW Depth Pothole\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "users",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere utenti - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere utenti - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"users"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/1",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReportToBeDeleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creazione report - Stato 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"pm.test(\"Creazione report - Secondo report creato in posizione [42.4642,13.19] ma questo verra  DELETED\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.position.coordinates).to.eql([42.4642, 13.1900])\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"LOW Depth Pothole\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/52",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"52"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reports",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere tutti i report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere tutti i report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere tutti i report - Contiene almeno un report\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "updateReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Aggiornare report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Aggiornare report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"MEDIUM Depth Pothole\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/51",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"51"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validateReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validare report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validare report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validare report - Messaggio di successo presente\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include('validated');\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/51/validate",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"51",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReportToBeRejected",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creazione report - Stato 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creazione report - Terzo report creato in posizione [42.4642,13.19] ma questo verra messo in stato REJECTED quindi non lo troveremo nel test del find\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.position.coordinates).to.eql([42.4642,13.1900]);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4642, 13.1900]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"HIGH Depth Pothole\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "rejectReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Rifiutare report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Rifiutare report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Rifiutare report - Messaggio di successo presente\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include('rejected');\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/53/reject",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"53",
+						"reject"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "bulkUpdateReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Aggiornamento di report in bulk - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Aggiornamento di report in bulk - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Aggiornamento di report in bulk - Messaggio di completamento presente\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include('Completed BulkUpdate');\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"validate_ids\": [1, 5, 7, 8, 10, 11, 13, 15, 16, 20, 22, 24, 27, 28, 30, 51, 52],\r\n    \"reject_ids\": [2, 3, 4, 6, 9, 12, 14, 17, 18, 19, 21, 23, 25, 26, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49]\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/bulk_update",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"bulk_update"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "myReports",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere i miei report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere i miei report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere i miei report - Contiene la lista di report\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/my_reports?startDate=12-12-2022&endDate=12-12-2040",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"my_reports"
+					],
+					"query": [
+						{
+							"key": "startDate",
+							"value": "12-12-2022"
+						},
+						{
+							"key": "endDate",
+							"value": "12-12-2040"
+						},
+						{
+							"key": "status",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "usersRanklist",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere lista di ranking - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere lista di ranking - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere lista di ranking - Contiene la lista degli utenti\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/users/ranklist",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"users",
+						"ranklist"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reportsStatistics",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere statistiche - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere statistiche - Contenuto è un file PDF\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"application/pdf\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere statistiche - Lunghezza del corpo della risposta è maggiore di 0\", function () {\r",
+							"    pm.expect(pm.response.text()).to.have.length.greaterThan(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/statistics?format=pdf",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"statistics"
+					],
+					"query": [
+						{
+							"key": "format",
+							"value": "pdf"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reportsDbscan",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Eseguire DBSCAN - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere statistiche - Contenuto è un file CSV\", function () {\r",
+							"    pm.expect(pm.response.headers.get(\"Content-Type\")).to.eql(\"text/csv\");\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere statistiche - Lunghezza del corpo della risposta è maggiore di 0\", function () {\r",
+							"    pm.expect(pm.response.text()).to.have.length.greaterThan(0);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/dbscan?eps=0.4&minPts=3&format=csv",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"dbscan"
+					],
+					"query": [
+						{
+							"key": "eps",
+							"value": "0.4"
+						},
+						{
+							"key": "minPts",
+							"value": "3"
+						},
+						{
+							"key": "format",
+							"value": "csv"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reportsFind",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere report entro intervallo - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report entro intervallo - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report entro intervallo di 1000 metri - Contiene report\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Numero di report ottenuti uguale a 1 (il primo punto creato in createReport (salvo generazione casuale nelle vicinanze da reportRepository.createRandomData() in /src/database/config))\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.length).to.eql(1);\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/find?lat=42.4642&lng=13.1900&range=800&startDate=12-12-2020",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"find"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "42.4642"
+						},
+						{
+							"key": "lng",
+							"value": "13.1900"
+						},
+						{
+							"key": "range",
+							"value": "800"
+						},
+						{
+							"key": "startDate",
+							"value": "12-12-2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "createReport2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Creazione report - Stato 201\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creazione report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Creare Report - Contiene report\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('object').that.is.not.empty;\r",
+							"});\r",
+							"pm.test(\"Creazione report - Report creato a distanza minore di un chilometro dagli altri in posizione  [42.4666,13.1966]\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.position.coordinates).to.eql([42.4666,13.1966]);\r",
+							"});\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"date\": \"11-30-2023\",\r\n    \"position\": {\r\n        \"type\": \"Point\",\r\n        \"coordinates\": [42.4666, 13.1966]\r\n    },\r\n    \"type\": \"Pothole\",\r\n    \"severity\": \"MEDIUM Depth Pothole\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validateReport2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validare report - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validare report - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validare report - Messaggio di successo presente\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.include('validated');\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/54/validate",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"54",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "reportsFind2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Ottenere report entro intervallo - Stato 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report entro intervallo - Risposta ha successo true\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.true;\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Ottenere report entro intervallo di 1000 metri - Contiene report\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"pm.test(\"Numero di report ottenuti uguale a 2 (il primo punto creato in createReport piu il secondo creato in createReport2 (salvo generazione casuale nelle vicinanze in /src/database/config))\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.results.length).to.eql(2);\r",
+							"});\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/find?lat=42.4642&lng=13.1900&range=800&startDate=12-12-2020",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"find"
+					],
+					"query": [
+						{
+							"key": "lat",
+							"value": "42.4642"
+						},
+						{
+							"key": "lng",
+							"value": "13.1900"
+						},
+						{
+							"key": "range",
+							"value": "800"
+						},
+						{
+							"key": "startDate",
+							"value": "12-12-2020"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "validateReportOtherUserReport",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validare report - Stato 401\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Validare report - Risposta ha successo false\", function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.success).to.be.false;\r",
+							"});\r",
+							"\r",
+							"pm.test(`Validare report - Risposta ha messaggio: 'Unauthorized.'`, function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.message).to.eql('Unauthorized.')\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(`Validare report - Risposta ha dettagli: 'Non hai i permessi per aggiornare questo report'`, function () {\r",
+							"    const jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.details).to.eql('Non hai i permessi per aggiornare questo report')\r",
+							"});\r",
+							"\r",
+							"pm.test(`Response time is within limit: ${parseInt(pm.environment.get(\"RES_TIME\"))}`, function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(parseInt(pm.environment.get(\"RES_TIME\")));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{TOKEN}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [
+					{
+						"key": "filter-header",
+						"value": "{{FILTER HEADER VALUE}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "127.0.0.1:{{API_PORT}}{{API_VERSION}}/reports/50/validate",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "{{API_PORT}}{{API_VERSION}}",
+					"path": [
+						"reports",
+						"50",
+						"validate"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "variable_key",
+			"value": ""
+		}
+	]
 }
