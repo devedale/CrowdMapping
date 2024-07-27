@@ -83,13 +83,13 @@ Backend in **Node.js** con **Express** che interagisce con un database **Postgre
 
 ### Cartella `repository`
 
-- Ogni modello ha un proprio repository (Role, User, Report) contenente metodi dedicati alla manipolazione dei dati senza preoccuparsi della validazione.
+- Ogni modello ha un proprio repository (Role, User, Report) contenente metodi dedicati alla manipolazione dei dati diretta senza validazione.
 
 ---
 
 ### Cartella `services`
 
-- Contiene i controller con la validazione delle richieste per "Role", "User", "Report" e una classe per "Export".
+- Formato da una classe di metodi che definiscono i controller con la validazione delle richieste per "Role", "User", "Report" e una classe per "Export" che definisce metodi generici non strettamente legati alle dinamiche di express.
  
 
 
