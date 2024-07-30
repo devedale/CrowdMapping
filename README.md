@@ -77,7 +77,7 @@ Backend in **Node.js** con **Express** che interagisce con un database **Postgre
 - **`models`**: 
   - Estensione della classe `Model` di Sequelize per definire le entità principali (Role, User, Report).
   
-- Definizione di una classe generica **`Dao`** per gestire operazioni base con il database utilizzando metodi di Sequelize mediati da una logica di cache LRU tramite Redis.
+  - Definizione di una classe generica **`Dao`** per gestire operazioni base con il database utilizzando metodi di Sequelize mediati da una logica di cache LRU tramite Redis.
 
 ---
 
@@ -219,7 +219,10 @@ Utilizza **Newman** per eseguire i test delle API.
 ```bash
 newman run app/pothole_crowdmapping.postman_collection.json -e app/pothole_crowdmapping.postman_environment.json
 ```
+**Per testare l'autenticazione RSA basta aggiornare la variabile TOKEN nell'environment:
 
+nel file di environment cambia il valore di TOKEN da {{HMAC_TEST_TOKEN}} a {{RSA_TEST_TOKEN}}.
+Salva le modifiche.**
 ## 📜 Licenza
 
 Distribuito sotto la **Licenza MIT**. Consulta il file `LICENSE` per maggiori dettagli.
@@ -238,4 +241,4 @@ Distribuito sotto la **Licenza MIT**. Consulta il file `LICENSE` per maggiori de
 ## 📝 Propositi per il Prossimo Progetto
 
 - Riconfermare la bontà della struttura/architettura del progetto 
-- Estendere/Modificare logica del middleware `reqValidate` con validazione anche base per `req.params` e `req.query` +  Gestione casi particolari nei controller con classe a parte metodi specifici di validazione
+- Estendere/Modificare logica del middleware `reqValidate` con validazione anche per `req.query` +  Gestione casi particolari nei controller con classe a parte metodi specifici di validazione
